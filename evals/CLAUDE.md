@@ -127,7 +127,9 @@ anything. Read the clean rate on this loop and ignore its bucket split.
 A sheet must not carry a construction the contract bans, because the writer carries
 it into the paragraph and the loop then tests the sheet instead of the writer. A
 hedged claim names a real subject ("No test has confirmed whether X"), never a
-clausal subject ("Whether X or Y has not been tested") or a dummy "it". Sheets carry
+clausal subject ("Whether X or Y has not been tested") or a dummy "it". A decision
+takes the decided thing as its subject ("Two new read replicas were approved"), never
+a gerund ("Adding two read replicas was approved"). Sheets carry
 no label-colon prefix such as `Root cause:`, no colon introducing a list, and no
 semicolon. Each sheet is one line of period-separated fragments with no bullet
 markers, so the judge has no list to call collapsed under `PC-round-trip-damage`.
