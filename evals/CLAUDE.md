@@ -436,8 +436,15 @@ rejudge, which called 54 of 71 rows clean for $25.91 in 53 seconds.
 The second `opus` medium run sets the noise floor. `sonnet` falls far below it on
 both measures and is not a substitute. `opus` high also falls below the floor. It
 reported 9 majority findings the first medium run did not, against 5 the other way.
-No hand review has checked whether those extra findings are real, so this run gives
-no reason to change the medium default.
+A hand review read the 14 majority findings where the first `opus` medium run and
+`opus` high disagreed, against the catalog the judges used. 7 of the 9 findings only
+high reported hold against the rule text. One does not, a single `PC-coordination`
+hit that the rule's flag-by-density clause excludes. One is contested between
+`PC-modifier-earns-place` and `PC-add-nothing`. 4 of the 5 findings only medium
+reported hold, and one, a three-noun list under `PC-parallel-triads`, is contested.
+High effort found more real violations at about the same precision, for $27.22
+against $25.91 per 71 rows. 14 findings are too few to settle the default on their
+own.
 
 A majority of three passes repeats more often than a single pass. Two passes of the
 first `opus` medium rejudge agreed on clean or dirty for 179 of 213 pass pairs, and
