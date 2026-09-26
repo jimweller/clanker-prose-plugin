@@ -394,8 +394,26 @@ tools/judge-agreement.py within /tmp/rejudge-sonnet.json
 two judges, with each rule's agree, a-only, and b-only counts. `within` reports clean
 and finding agreement between one judge's passes.
 
-No judge calibration has run through the plugin yet. The `opus`, medium-effort
-default carries no measured comparison against another judge.
+Measured on 2026-09-26 by rejudging compliance run 2's rewrites, one per paragraph,
+71 rows at 3 passes each. Each table row compares a judge with a first `opus` medium
+rejudge, which called 54 of 71 rows clean for $25.91 in 53 seconds.
+
+| Judge                     | Clean rows | Clean-majority agreement | Majority-finding agreement | Cost   | Time  |
+| ------------------------- | ---------- | ------------------------ | -------------------------- | ------ | ----- |
+| `opus` medium, second run | 54 of 71   | 67 of 71                 | 15 of 20                   | $25.94 | 45s   |
+| `opus` high               | 49 of 71   | 62 of 71                 | 13 of 27                   | $27.22 | 53s   |
+| `sonnet` medium           | 61 of 71   | 52 of 71                 | 2 of 24                    | $19.65 | 3m19s |
+
+The second `opus` medium run sets the noise floor. `sonnet` falls far below it on
+both measures and is not a substitute. `opus` high also falls below the floor. It
+reported 9 majority findings the first medium run did not, against 5 the other way.
+No hand review has checked whether those extra findings are real, so this run gives
+no reason to change the medium default.
+
+A majority of three passes repeats more often than a single pass. Two passes of the
+first `opus` medium rejudge agreed on clean or dirty for 179 of 213 pass pairs, and
+two passes of the second for 195 of 213. The majority verdict of three passes
+repeated across the two runs on 67 of 71 rows.
 
 ## Mining candidates
 
