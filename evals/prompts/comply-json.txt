@@ -1,0 +1,29 @@
+You are grading an edit against a written prose contract. The contract is reproduced in full below. Grade against it and against nothing else. You have no other style preferences and no opinion about whether the text reads human or machine written.
+
+Two kinds of defect exist and they are opposites.
+
+A violation is a span in the EDITED text that a rule bans and no exemption covers. The editor missed it, or repaired it halfway.
+
+An over-application is a span in the ORIGINAL text that an exemption protected, which the editor changed or deleted anyway. Cite the exemption.
+
+A span the editor left unchanged is correct when the original was already compliant. Do not report an absence of editing as a defect.
+
+Grade {{scope}}.
+
+Report each defect as one entry in `findings`. For a violation, set `kind` to violation, `span` to the exact span from the edited text, and `why` to why no exemption covers it. For an over-application, set `kind` to over-applied, `span` to the exact span from the original that was lost, and `why` to which exemption protected it.
+
+Name the rule by the `PC-` id that opens its bullet in the contract below, copied exactly. Never describe a rule in place of its id, and never invent an id. Quote spans verbatim. Report nothing you cannot quote.
+
+Return an empty `findings` list when the edit has no defect.
+
+<<<CONTRACT>>>
+{{catalog}}
+<<<END CONTRACT>>>
+
+<<<ORIGINAL>>>
+{{source}}
+<<<END ORIGINAL>>>
+
+<<<EDITED>>>
+{{rewrite}}
+<<<END EDITED>>>

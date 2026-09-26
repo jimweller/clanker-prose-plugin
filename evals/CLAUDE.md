@@ -18,14 +18,74 @@ changes what both suites score the next time a hook fires.
 
 ```bash
 cd evals
-npx promptfoo@latest eval                                  # rewrite suite, 595 cases
-npx promptfoo@latest eval -c promptfooconfig.comply.yaml   # compliance loop, 71 paragraphs
-npx promptfoo@latest eval -c promptfooconfig.generate.yaml # generation loop, 15 fact sheets
-tools/comply-report.py /tmp/out.json                       # triage either loop's run
+npx promptfoo@0.123.1 eval --no-cache                                   # rewrite suite, 595 cases
+npx promptfoo@0.123.1 eval -c promptfooconfig.comply.yaml --no-cache    # compliance loop, 71 paragraphs
+npx promptfoo@0.123.1 eval -c promptfooconfig.generate.yaml --no-cache  # generation loop, 15 fact sheets
+tools/comply-report.py /tmp/out.json                                    # triage either loop's run
+node --test tests/ && python3 -m unittest discover -s tests -p 'test_*.py'
 ```
 
-No install step. The providers authenticate through whatever Claude Code already
-uses, so no API key is needed.
+No install step. The writers and judges authenticate through the parent shell's
+Foundry or Anthropic key and read routing from `~/.claude/settings.json`, so no
+API key goes in a config. `corpus/comply.csv` is gitignored because it holds mined
+Confluence text. It was rebuilt on 2026-09-26 from the test vars that promptfoo
+stored in `~/.promptfoo/promptfoo.db` for eval `eval-FBV-2026-09-19T12:05:05`.
+
+## The promptfoo judge
+
+The compliance and generation loops grade inside promptfoo.
+`providers/writer.py` runs one `claude -p` writer per case with
+`--setting-sources ""` and `--plugin-dir` on this plugin, from a fresh temp
+directory. `graders/judge.js` runs three `claude -p --bare` judge passes against
+`prompts/comply-json.txt` with a JSON schema whose rule enum is the contract's
+`PC-` ids. A row is clean when a majority of passes report no finding. Every row
+carries namedScores for the derived metrics, and one componentResults entry per
+`(kind, rule)` finding with each pass's span.
+
+| Knob                          | Default          | Effect                                                                                           |
+| ----------------------------- | ---------------- | ------------------------------------------------------------------------------------------------ |
+| `EVAL_MODEL`                  | `opus`           | Writer model alias                                                                               |
+| `JUDGE_MODEL`, `JUDGE_EFFORT` | `opus`, `medium` | Judge model alias and effort                                                                     |
+| `JUDGE_PASSES`                | 3                | Judge passes per row                                                                             |
+| `JUDGE_MODE`                  | `whole`          | `groups` splits each pass into the four `tools/bullet-groups.json` groups plus a 54-id remainder |
+| `JUDGE_CATALOG`               | unset            | Pins the judge to a catalog copy for an A/B                                                      |
+| `JUDGE_MAX_PROCS`             | 96               | Concurrent judge processes per promptfoo run                                                     |
+| `REWRITE_NOTES_DIR`           | `corpus/notes`   | Where the editor's notes land                                                                    |
+
+Env beats config, which beats the default. `tools/comply-report.py` recomputes
+every rate and exits 1 on a mismatch with promptfoo's derived metrics, a cached
+row, a judge error, or a writer error. Findings are per row, by majority unless
+`--findings union` is passed.
+
+The editor writes its notes inside its own temp directory, and the provider copies
+them to `REWRITE_NOTES_DIR`. Claude Code refuses a write inside a `--plugin-dir`
+directory as a sensitive file, and `corpus/notes` sits inside the plugin.
+
+`promptfooconfig.comply.rejudge.yaml` grades stored rewrites again without running
+the writer. `tools/rejudge-tests.py` builds its tests from a prior `-o` JSON, and
+`tools/judge-agreement.py` compares passes within a run, a run against the legacy
+text judge, and two rejudges of the same text.
+
+Measured on 2026-09-26, on the 71 first-repeat rewrites of the last legacy run.
+
+| Measure                                           | Result                 |
+| ------------------------------------------------- | ---------------------- |
+| Clean by majority, JSON judge, two rejudges       | 69.0% and 70.4%        |
+| Clean, legacy text judge on the same rewrites     | 71.8%                  |
+| Clean-majority agreement between the two rejudges | 64 of 71 (90%)         |
+| Pass-vs-pass clean agreement                      | 177 of 213 pairs (83%) |
+| Pass-vs-pass finding agreement                    | 44 of 108 (41%)        |
+| Per-pass verdict agreement with the legacy judge  | 149 of 213 (70%)       |
+| Finding agreement with the legacy judge           | 18 of 118 (15%)        |
+
+The legacy judge ran on the model before `opus` 5.5, so the agreement with it
+mixes a format change with a model change. Whole mode costs about $0.36 of judge
+per row and group mode about $1.81, measured on smoke runs.
+
+The generation loop is blocked on `opus` 5.5. The model's safeguard refuses
+`prompts/generate-notes.txt` with `reasoning_extraction` on 4 of 4 calls. A variant
+without the notes section passed 3 of 3, and a variant whose notes lines copy the
+rewrite prompt's wording failed 2 of 4. The prompt is unchanged pending a decision.
 
 Concurrency measured at 6.2 cases per minute at `-j 24`, 10.7 at `-j 48`, and 20.3
 at `-j 96`. A 213-call compliance arm runs in 5 to 6 minutes at 96. Load average
@@ -225,10 +285,11 @@ clean-or-dirty verdicts. Per-rule counts below about five are inside that noise.
 On a 213-run arm, roughly 40 runs can flip between two identical runs, so a
 movement smaller than that is not a result.
 
-**Repeats are a recall mechanism, not noise-averaging.** One pass finds about 39
-percent of what a second pass finds, so `comply-report.py` takes the union across
-repeats rather than counting every occurrence. Counting occurrences ranked rules by
-how reliably the judge noticed them instead of how often the editor broke them.
+**Judge passes are a recall mechanism.** One pass finds about 39 percent of what a
+second pass finds. The legacy report took the union of findings across three
+repeats, which were three different rewrites of one case. The promptfoo judge runs
+three passes on one rewrite instead, and `comply-report.py` keeps a finding when a
+majority of those passes report it, or any pass with `--findings union`.
 
 **Both sides read the same contract**, so sharpening a rule teaches the judge what
 to look for at the same moment it instructs the editor. Adding a modality clause to
@@ -354,6 +415,12 @@ One pass per case cannot tell a rule improvement from model variance. Three full
 runs of the rewrite suite scored 94, 97 and 96 percent, and between two of them
 `praise adjectives` fell from 100 to 70 on cases nobody had touched.
 
+On 2026-09-26 the plugin delivery scored 93.3 and 92.9 percent at `--repeat 1`. A
+same-day control with the pre-cut `claude_md.md` loaded as user memory and the
+pre-move skill scored 95.0 percent. The per-case paired difference is -1.9 points
+(t about -2.7 over 595 cases). The banned-literals grader failed on no row in any of
+the three runs.
+
 ```bash
 tools/measure-bullet.sh gnomic- before
 # edit skills/prose/SKILL.md
@@ -428,10 +495,9 @@ URLs, clock times, and ratios are stripped.
 `length-guard.js` fails a rewrite that grew past 1.1x its source, and only on
 sources of 40 words or more. `MIN_WORDS` and `TOLERANCE` are guesses.
 
-The compliance loop carries one assertion, that the judge emitted a parseable
-`VERDICT` line. That is a format check so a malformed run is visible, not a style
-judgment. The contract is stylistic and every rule has an exemption, so a string
-assertion cannot encode one.
+The compliance and generation loops carry one assertion, `graders/judge.js`, which
+is the judge itself. The legacy configs carried a format check that the judge
+emitted a parseable `VERDICT` line and graded afterward in `comply-report.py`.
 
 ## Layout
 

@@ -1,5 +1,5 @@
 {
-  "_note": "Rules a regex pass detects poorly or not at all, split into small themed groups. Anthropic's eval guidance is to grade each dimension with an isolated judge rather than one judge holding every dimension, so no group carries more than seven rules. Entries are PC- ids, which open each rule's bullet inside <prose-contract> in the global instructions.",
+  "_note": "Rules a regex pass detects poorly or not at all, split into small themed groups. Anthropic's eval guidance is to grade each dimension with an isolated judge rather than one judge holding every dimension, so no group carries more than seven rules. Entries are PC- ids, which open each rule's bullet inside <prose-contract> in skills/prose/SKILL.md. The judge's group mode adds one more unit holding every id these groups leave out, so each id is judged once per pass.",
   "rhythm": [
     "PC-landing-beats",
     "PC-parallel-triads",

@@ -1,30 +1,32 @@
 #!/usr/bin/env python3
-"""Triages a compliance run by diffing the editor's notes against the judge's findings.
+"""Triages a compliance or generation run by diffing the editor's notes against the judge's findings.
 
-The two enumerations disagree in four distinct ways, and each one points at a
-different repair in the contract. That is the whole reason both sides enumerate.
+The two enumerations disagree in distinct ways, and each one points at a different repair.
 
-    fired-then-over-applied   The editor applied rule R and the judge says
-                              an exemption covered the span. The exemption is
-                              too weak, or its markers read as an unconditional
-                              ban.
+    fired-then-over-applied   The editor applied rule R and the judge says an exemption
+                              covered the span. The exemption is too weak, or its markers
+                              read as an unconditional ban.
+    held-then-violation       The editor declined R on an exemption and the judge says the
+                              exemption did not reach. The exemption is too broad.
+    unseen-violation          The judge cites R and R appears nowhere in the notes. R's
+                              markers are incomplete or the rule is not reaching the span.
+    self-inflicted            No span the judge quoted for R appears in the original, so the
+                              rewrite created the defect. The contract caused what it bans.
 
-    held-then-violation       The editor declined to apply R on an exemption and
-                              the judge says the exemption did not reach. The
-                              exemption is too broad.
+Reads both shapes of run. A graded row carries the promptfoo judge's GradingResult, with
+namedScores and one componentResults entry per finding key, and its notes in the provider
+metadata. A legacy row carries the old exec provider's text artifact and is read as one pass.
 
-    unseen-violation          The judge cites R and R appears nowhere in the
-                              trace. The editor never noticed, so R's markers
-                              are incomplete or the rule is not reaching it.
+Findings are per row. Each row is one rewrite, so the old union of findings across three
+different rewrites of a case is gone. --findings maj (default) keeps the keys at least
+floor(P/2)+1 judge passes reported, and --findings union keeps a key any pass reported.
 
-    self-inflicted            The violating span is absent from the original, so
-                              the rewrite created it. The highest-value class,
-                              because the contract caused the defect it bans.
-
-Cases where the judge reported nothing need no reading and are counted only.
+For graded rows every rate is recomputed twice, from each row's findings against its own
+namedScores and as column sums against promptfoo's derived metrics. The report exits 1 on
+a mismatch, a cached row, a judge error, or a writer or isolation error.
 
 Usage
-    tools/comply-report.py RESULT_JSON [--show N] [--rule NAME]
+    tools/comply-report.py RESULT_JSON [--findings maj|union] [--show N] [--rule PC-ID]
 """
 
 import argparse
@@ -32,21 +34,25 @@ import collections
 import json
 import pathlib
 import re
-import sys
 
 SECTION = re.compile(r"<<<(NOTES|REWRITE|FINDINGS)>>>")
-VERDICT = re.compile(r"VERDICT\s+violations=(\d+)\s+over-applied=(\d+)", re.I)
 EVAL_ROOT = pathlib.Path(__file__).resolve().parent.parent
 BLOCK = re.compile(r"<prose-contract>(.*?)</prose-contract>", re.DOTALL)
+CLASSES = ("good", "mixed", "slop")
+DERIVED = {
+    "clean_maj_rate": ("cmp_clean_maj", "cmp_judged"),
+    "clean_union_rate": ("cmp_clean_union", "cmp_judged"),
+    "clean_pass_rate": ("cmp_pass_clean", "cmp_passes"),
+    "pass_agree_rate": ("cmp_pass_agree", "cmp_judged"),
+    "viol_maj_rate": ("cmp_viol_maj", "cmp_judged"),
+    "over_maj_rate": ("cmp_over_maj", "cmp_judged"),
+    **{f"clean_rate_{c}": (f"cmp_clean_maj_{c}", f"cmp_judged_{c}") for c in CLASSES},
+}
+ROW_ERRORS = ("ISOLATION_BREACH", "WRITER_ERROR")
+ORDER = ["self-inflicted", "fired-then-over-applied", "held-then-violation", "unseen-violation", "fired-then-violation", "over-applied-untraced"]
 
 
-def known_ids() -> set:
-    """Every PC- id the contract defines, so an invented one is visible in the report.
-
-    A rule named in free text could be wrong in a way nothing detected. An id either
-    exists or it does not, so a judge citing PC-something-plausible now surfaces as an
-    unknown rather than as a finding against a rule that was never written.
-    """
+def known_ids():
     contract = EVAL_ROOT.parent / "skills" / "prose" / "SKILL.md"
     blocks = BLOCK.findall(contract.read_text())
     if len(blocks) != 1:
@@ -54,19 +60,7 @@ def known_ids() -> set:
     return set(re.findall(r"^- `(PC-[a-z0-9-]+)`", blocks[0], re.MULTILINE))
 
 
-def norm(rule: str) -> str:
-    """Rules are named by PC- id now, so matching is exact rather than fuzzy.
-
-    Before ids this stripped case and punctuation to reconcile two sessions naming one
-    rule differently, and it still could not merge a short name with a long one. One run
-    scored `trailing supplements` and `trailing supplements that hang a second beat on a
-    finished clause` as two rules at 3 each instead of one at 6, and did that to three
-    rules. Case folding is all that remains, because an id is already canonical.
-    """
-    return rule.strip().lower()
-
-
-def split_artifact(text: str) -> dict:
+def split_artifact(text):
     parts, last, pos = {}, None, 0
     for m in SECTION.finditer(text):
         if last:
@@ -77,197 +71,191 @@ def split_artifact(text: str) -> dict:
     return parts
 
 
-def parse_trace(block: str):
-    """Reads the editor's notes, which it writes to a file rather than to stdout.
-
-    Keeping notes out of stdout matters twice. The judge grades only the rewrite, and
-    the rewrite is what a real `/prose` run prints, so the measured artifact is the
-    real one. An earlier version had the editor print its reasoning inline, which the
-    judge then graded as prose.
-    """
-    fired, held, malformed = {}, {}, "NO NOTES FILE" in block
+def parse_notes(block):
+    fired, held = set(), set()
     for line in block.splitlines():
         cells = [c.strip() for c in line.split("|")]
         if len(cells) < 3:
             continue
-        # FIRED and HELD are the older tags. Runs stored before the prompt switched
-        # to plain language still parse, so a baseline stays comparable.
         tag = cells[0].upper()
         if tag in ("VIOLATED", "FIRED"):
-            fired[norm(cells[1])] = cells[1]
+            fired.add(cells[1].lower())
         elif tag in ("NOT VIOLATED", "HELD"):
-            held[norm(cells[1])] = cells[1]
-    return fired, held, malformed
+            held.add(cells[1].lower())
+    return fired, held
 
 
-def parse_findings(block: str):
+def parse_legacy_findings(block):
     out = []
     for line in block.splitlines():
         cells = [c.strip() for c in line.split("|")]
-        if len(cells) < 4 or cells[0].upper() != "FINDING":
+        if len(cells) < 4 or cells[0].upper() != "FINDING" or cells[1].lower() not in ("violation", "over-applied"):
             continue
-        kind = cells[1].lower()
-        if kind not in ("violation", "over-applied"):
-            continue
-        out.append({"kind": kind, "rule": cells[2], "span": cells[3].strip('"'),
-                    "why": cells[4] if len(cells) > 4 else ""})
+        out.append({"kind": cells[1].lower(), "rule": cells[2], "spans": [cells[3].strip('"')], "why": cells[4] if len(cells) > 4 else ""})
     return out
 
 
-def main() -> int:
-    ap = argparse.ArgumentParser()
+def vars_of(row):
+    return (row.get("testCase") or {}).get("vars") or row.get("vars") or {}
+
+
+def graded(row, mode):
+    g = row.get("gradingResult") or {}
+    scores = g.get("namedScores") or {}
+    found = [c["metadata"] for c in g.get("componentResults") or []
+             if (c.get("metadata") or {}).get("role") == "finding" and c["metadata"].get("judge_kind") == "comply"]
+    problems = []
+    if scores.get("cmp_judged"):
+        p = scores["cmp_passes"]
+        m = p // 2 + 1
+        dirty = {x["pass_index"] for f in found for x in f["passes"]}
+        by_kind = lambda k: len({x["pass_index"] for f in found if f["kind"] == k for x in f["passes"]})
+        clean = p - len(dirty)
+        expect = {"cmp_pass_clean": clean, "cmp_clean_maj": int(clean >= m), "cmp_clean_union": int(clean == p),
+                  "cmp_pass_agree": int(clean in (0, p)), "cmp_viol_maj": int(by_kind("violation") >= m), "cmp_over_maj": int(by_kind("over-applied") >= m)}
+        for k, v in expect.items():
+            if scores.get(k, 0) != v:
+                problems.append(f"INCONSISTENT {k}={scores.get(k)} but the findings give {v}")
+    keep = [f for f in found if mode == "union" or f["majority"]]
+    findings = [{"kind": f["kind"], "rule": f["rule"], "spans": [x["span"] for x in f["passes"]], "why": f["passes"][0]["why"], "votes": f["votes"]} for f in keep]
+    meta = (row.get("response") or {}).get("metadata") or {}
+    notes = meta.get("notes", "")
+    return scores, findings, notes, bool(meta.get("notes_missing")), problems
+
+
+def legacy(row):
+    parts = split_artifact((row.get("response") or {}).get("output") or "")
+    findings = parse_legacy_findings(parts.get("FINDINGS", ""))
+    notes = parts.get("NOTES", "")
+    clean = int(not findings)
+    by = lambda k: int(any(f["kind"] == k for f in findings))
+    scores = {"cmp_judged": 1, "cmp_passes": 1, "cmp_pass_clean": clean, "cmp_clean_maj": clean, "cmp_clean_union": clean,
+              "cmp_pass_agree": 1, "cmp_viol_maj": by("violation"), "cmp_over_maj": by("over-applied")}
+    klass = vars_of(row).get("expect")
+    if klass in CLASSES:
+        scores[f"cmp_judged_{klass}"] = 1
+        scores[f"cmp_clean_maj_{klass}"] = clean
+    return scores, findings, notes, "NO NOTES FILE" in notes, []
+
+
+def is_graded(row):
+    return any((c.get("metadata") or {}).get("role") == "judge" for c in (row.get("gradingResult") or {}).get("componentResults") or [])
+
+
+def bucket(f, source, fired, held):
+    key = f["rule"].lower()
+    if f["kind"] == "over-applied":
+        return "fired-then-over-applied" if key in fired else "over-applied-untraced"
+    if all(s.strip() and s.strip() not in source for s in f["spans"]):
+        return "self-inflicted"
+    if key in held:
+        return "held-then-violation"
+    if key in fired:
+        return "fired-then-violation"
+    return "unseen-violation"
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("result_json")
+    ap.add_argument("--findings", choices=("maj", "union"), default="maj")
     ap.add_argument("--show", type=int, default=3, help="examples per bucket")
     ap.add_argument("--rule", help="only this rule id")
-    args = ap.parse_args()
+    args = ap.parse_args(argv)
 
-    rows = (json.loads(pathlib.Path(args.result_json).read_text())
-            .get("results") or {}).get("results") or []
-    if not rows:
-        print("no results", file=sys.stderr)
-        return 1
-
+    with open(args.result_json) as f:
+        data = json.load(f)
+    rows = data["results"]["results"]
+    prompts = {p.get("provider"): (p.get("metrics") or {}).get("namedScores") or {} for p in data["results"].get("prompts") or []}
     ids = known_ids()
+
+    cols = collections.OrderedDict()
+    problems = []
     buckets = collections.defaultdict(list)
     per_rule = collections.defaultdict(collections.Counter)
     unknown = collections.Counter()
-    n = clean = malformed_n = unparsed = 0
-    viol_total = over_total = 0
-
-    # One judge pass finds roughly 39 percent of what a second pass on the same text
-    # finds, measured by re-judging 48 stored rewrites with the same model and
-    # settings. Counting every occurrence therefore scores a defect caught in all
-    # three repeats at 3 and one caught once at 1, which ranks by how reliably the
-    # judge notices a rule rather than by how often the editor breaks it.
-    #
-    # Deduplicating on case, rule and kind takes the union across repeats instead.
-    # Precision is already good, since 8 of 9 findings read by hand against source
-    # and rewrite were correct, so the union raises recall without adding false
-    # positives. Three passes at a 39 percent per-pass rate reach roughly 78 percent.
-    #
-    # Case-level clean rate is unaffected and stays the most reliable number here,
-    # agreeing 81 percent across two identical judge runs.
-    seen_findings = set()
-    repeats = collections.Counter()
-    # comply.csv carries genre since the selection started recording provenance.
-    # Meeting minutes are AI-transcribed attributed speech rather than authored
-    # prose, and they score differently, so they are reported apart rather than
-    # averaged into the headline.
-    by_genre = collections.defaultdict(lambda: [0, 0])
-
-    # The editor's notes vary between repeats the same way the judge's findings do,
-    # so bucketing a deduped finding against one arbitrary run's notes loses the
-    # trace. Union the notes per case first, then a rule counts as considered if the
-    # editor mentioned it on any pass.
-    notes_fired = collections.defaultdict(dict)
-    notes_held = collections.defaultdict(dict)
-    for r in rows:
-        out = ((r.get("response") or {}).get("output") or "")
-        if not isinstance(out, str) or "<<<FINDINGS>>>" not in out:
+    for i, row in enumerate(rows):
+        provider = row.get("provider") or {}
+        label = provider.get("label") or provider.get("id") or "unknown"
+        col = cols.setdefault(label, {"rows": 0, "adapters": set(), "sums": collections.Counter(), "missing_notes": 0,
+                                      "writer_cost": 0.0, "judge_cost": 0.0})
+        col["rows"] += 1
+        resp = row.get("response") or {}
+        # promptfoo also fills row.error with an assertion's failure reason, so only a row
+        # that never reached grading is a provider error, whatever its text says.
+        err = str(row.get("error") or resp.get("error") or "")
+        if err and (not row.get("gradingResult") or row.get("failureReason") == 2):
+            kind = next((e for e in ROW_ERRORS if err.startswith(e)), "PROVIDER_ERROR")
+            problems.append(f"{kind} row {i} ({label}): {err[:300]}")
             continue
-        v = (r.get("testCase") or {}).get("vars") or {}
-        case = v.get("__description") or (r.get("testCase") or {}).get("description") or "?"
-        f, h, _ = parse_trace(split_artifact(out).get("NOTES", ""))
-        notes_fired[case].update(f)
-        notes_held[case].update(h)
-
-    for r in rows:
-        out = ((r.get("response") or {}).get("output") or "")
-        if not isinstance(out, str) or "<<<FINDINGS>>>" not in out:
-            unparsed += 1
+        if resp.get("cached"):
+            problems.append(f"CACHED row {i} ({label})")
+        g = row.get("gradingResult") or {}
+        if (g.get("namedScores") or {}).get("cmp_judge_error") or str(g.get("reason", "")).startswith("JUDGE_ERROR"):
+            problems.append(f"JUDGE_ERROR row {i} ({label}): {g.get('reason', '')}")
             continue
-        n += 1
-        case = ((r.get("testCase") or {}).get("vars") or {}).get("__description") \
-            or (r.get("testCase") or {}).get("description") or "?"
-        parts = split_artifact(out)
-        source = ((r.get("testCase") or {}).get("vars") or {}).get("passage", "")
-        _, _, malformed = parse_trace(parts.get("NOTES", ""))
-        malformed_n += malformed
-        fired, held = notes_fired[case], notes_held[case]
-        findings = parse_findings(parts.get("FINDINGS", ""))
-
-        # "expect" records the judgment a reader should reach on the source, so
-        # restraint and repair score separately. `good` is prose already written to
-        # the contract, where a rewrite should change almost nothing.
-        v = (r.get("testCase") or {}).get("vars") or {}
-        klass = v.get("expect") or v.get("genre")
-        if klass:
-            by_genre[klass][0] += 1
-            if not findings:
-                by_genre[klass][1] += 1
-
-        if not findings:
-            clean += 1
-            continue
-
+        adapter = "graded" if is_graded(row) else "legacy"
+        col["adapters"].add(adapter)
+        scores, findings, notes, notes_missing, row_problems = graded(row, args.findings) if adapter == "graded" else legacy(row)
+        problems += [f"{p} (row {i}, {label})" for p in row_problems]
+        col["sums"].update(scores)
+        col["missing_notes"] += int(notes_missing)
+        col["writer_cost"] += resp.get("cost") or 0
+        col["judge_cost"] += sum((c.get("metadata") or {}).get("cost_total") or 0 for c in (row.get("gradingResult") or {}).get("componentResults") or []
+                                 if (c.get("metadata") or {}).get("role") == "judge")
+        v = vars_of(row)
+        case = v.get("__description") or (row.get("testCase") or {}).get("description") or f"row {i}"
+        fired, held = parse_notes(notes)
         for f in findings:
-            key = norm(f["rule"])
-            if args.rule and args.rule.lower() not in f["rule"].lower():
+            if args.rule and args.rule.lower() != f["rule"].lower():
                 continue
-            dedupe = (case, key, f["kind"])
-            repeats[dedupe] += 1
-            if dedupe in seen_findings:
-                continue
-            seen_findings.add(dedupe)
-            if f["kind"] == "over-applied":
-                over_total += 1
-                bucket = "fired-then-over-applied" if key in fired else "over-applied-untraced"
-            else:
-                viol_total += 1
-                span = f["span"].strip()
-                if span and span not in source:
-                    bucket = "self-inflicted"
-                elif key in held:
-                    bucket = "held-then-violation"
-                elif key in fired:
-                    bucket = "fired-then-violation"
-                else:
-                    bucket = "unseen-violation"
             if f["rule"] not in ids:
                 unknown[f["rule"]] += 1
-            per_rule[f["rule"]][bucket] += 1
-            buckets[bucket].append((case, f))
+            b = bucket(f, v.get("passage", ""), fired, held)
+            per_rule[f["rule"]][b] += 1
+            buckets[b].append((case, f))
 
-    print(f"runs parsed {n}, clean runs {clean} ({clean / n * 100:.0f}%), "
-          f"missing notes {malformed_n}, unparsed {unparsed}")
-    if by_genre:
-        for g in sorted(by_genre):
-            gn, gc = by_genre[g]
-            print(f"  {g:<8} {gn:>3} runs, clean {gc:>3} ({gc / gn * 100:.0f}%)")
-    print(f"distinct findings, deduped across repeats: "
-          f"violations {viol_total}, over-applications {over_total}")
-    if repeats:
-        once = sum(1 for v in repeats.values() if v == 1)
-        print(f"reproducibility: {len(repeats)} distinct findings, "
-              f"{once} seen in only one pass ({once / len(repeats) * 100:.0f}%)")
+    for label, col in cols.items():
+        s = col["sums"]
+        rates = {name: (s[num] / s[den] if s[den] else None) for name, (num, den) in DERIVED.items()}
+        if "graded" in col["adapters"]:
+            derived = prompts.get(label, {})
+            for name, value in rates.items():
+                if value is None:
+                    continue
+                got = derived.get(name)
+                if got is None or abs(got - value) > 1e-9:
+                    problems.append(f"MISMATCH {label} {name}: recomputed {value:.6f}, promptfoo derived {got}")
+        head = " ".join(f"{k}={v:.3f}" for k, v in rates.items() if v is not None and not k.startswith("clean_rate_"))
+        print(f"== {label} ==  adapter={'+'.join(sorted(col['adapters'])) or 'none'} rows={col['rows']} judged={s['cmp_judged']} {head}")
+        print(f"  missing notes {col['missing_notes']}  writer_cost=${col['writer_cost']:.2f}  judge_cost=${col['judge_cost']:.2f}")
+        for c in CLASSES:
+            if s[f"cmp_judged_{c}"]:
+                print(f"  {c:<8}{s[f'cmp_judged_{c}']:>4} rows, clean {s[f'cmp_clean_maj_{c}']:>3} ({100 * s[f'cmp_clean_maj_{c}'] / s[f'cmp_judged_{c}']:.0f}%)")
+    print(f"\nfindings ({args.findings})")
+    print("bucket                     n")
+    for b in ORDER:
+        if buckets[b]:
+            print(f"{b:<26} {len(buckets[b])}")
     if unknown:
         print(f"\n{sum(unknown.values())} findings cite an id the contract does not define:")
         for rid, k in unknown.most_common(10):
             print(f"  {k:>3}  {rid!r}")
-    print()
-
-    order = ["self-inflicted", "fired-then-over-applied", "held-then-violation",
-             "unseen-violation", "fired-then-violation", "over-applied-untraced"]
-    print("bucket                     n")
-    for b in order:
-        if buckets[b]:
-            print(f"{b:<26} {len(buckets[b])}")
-
     print("\nrules by total findings")
-    ranked = sorted(per_rule.items(), key=lambda kv: -sum(kv[1].values()))
-    for rule, counts in ranked[:15]:
-        detail = " ".join(f"{k}={v}" for k, v in counts.most_common())
-        print(f"{sum(counts.values()):>3}  {rule}  [{detail}]")
-
-    for b in order:
-        if not buckets[b]:
-            continue
-        print(f"\n--- {b} ---")
-        for case, f in buckets[b][:args.show]:
-            print(f"[{case}] {f['rule']}")
-            print(f"    span  {f['span'][:160]}")
-            print(f"    why   {f['why'][:200]}")
-    return 0
+    for rule, counts in sorted(per_rule.items(), key=lambda kv: -sum(kv[1].values()))[:15]:
+        print(f"{sum(counts.values()):>3}  {rule}  [{' '.join(f'{k}={v}' for k, v in counts.most_common())}]")
+    for b in ORDER:
+        if buckets[b]:
+            print(f"\n--- {b} ---")
+            for case, f in buckets[b][:args.show]:
+                print(f"[{case}] {f['rule']}")
+                print(f"    span  {f['spans'][0][:160]}")
+                print(f"    why   {f['why'][:200]}")
+    if problems:
+        print()
+    for p in problems:
+        print(p)
+    return 1 if problems else 0
 
 
 if __name__ == "__main__":

@@ -1,11 +1,9 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
-# The generation loop. A fact sheet from cases/generate.csv goes in, the writer composes
-# one paragraph with the clanker-prose plugin, and graders/judge.js grades it against the
-# contract with the sheet standing in as the original.
+# Rejudges stored generated paragraphs without running the writer again.
 #
-#   npx promptfoo@0.123.1 eval -c promptfooconfig.generate.yaml --no-cache -o /tmp/generate.json
-#   tools/comply-report.py /tmp/generate.json
-description: Generation loop, a writer composes from a fact sheet then a JSON judge grades against the contract
+#   tools/rejudge-tests.py /tmp/generate.json corpus/rejudge/generate.json
+#   npx promptfoo@0.123.1 eval -c promptfooconfig.generate.rejudge.yaml --no-cache -o /tmp/rejudge.json
+description: Generation rejudge of stored paragraphs
 
 commandLineOptions:
   repeat: 1
@@ -16,12 +14,8 @@ prompts:
   - file://prompts/passage.txt
 
 providers:
-  - id: file://providers/writer.py
-    label: generate
-    config:
-      task: generate
-      workers: 96
-      timeout: 600000
+  - id: echo
+    label: rejudge
 
 defaultTest:
   assert:
@@ -50,4 +44,4 @@ derivedMetrics:
   - name: over_maj_rate
     value: cmp_over_maj / cmp_judged
 
-tests: file://cases/generate.csv
+tests: file://corpus/rejudge/generate.json

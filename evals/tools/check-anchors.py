@@ -8,12 +8,14 @@ finished clause` at 3 instead of one rule at 6, and it did that to three rules.
 `evals/CLAUDE.md` records the same failure in the case files, where a typo in the `bullet`
 column "silently creates a new bullet".
 
-Four checks, each catching a different way the two can drift.
+Five checks, each catching a different way the two can drift.
 
     unknown id       A `bullet` value in cases/*.csv names an id the contract does not have
     orphan rule      A rule in the contract has no id at all, or carries two
     duplicate id     Two rules claim the same id
     dangling move    A [move N] tag points at a move How to Write does not define
+    group drift      tools/bullet-groups.json names an id the contract lacks, or puts one
+                     id in two groups, which would judge it twice per pass in group mode
 
 An id with no case row is reported but does not fail, because a rule is allowed to exist
 before anyone writes a case for it.
@@ -25,6 +27,7 @@ Usage
 import collections
 import csv
 import glob
+import json
 import pathlib
 import re
 import sys
@@ -97,9 +100,20 @@ def main() -> int:
 
     uncovered = sorted(known - set(used))
 
+    groups = {k: v for k, v in json.loads((EVAL_ROOT / "tools" / "bullet-groups.json").read_text()).items() if not k.startswith("_")}
+    owner = {}
+    for name, members in groups.items():
+        for g in members:
+            if g not in known:
+                failures.append(f"bullet-groups.json: group {name} names unknown id {g!r}")
+            if g in owner:
+                failures.append(f"bullet-groups.json: {g} sits in both {owner[g]} and {name}")
+            owner.setdefault(g, name)
+
     print(f"contract rules {len(ids)}, unique {len(known)}")
     print(f"moves defined {sorted(defined_moves)}")
     print(f"case rows {sum(used.values())} across {len(used)} ids")
+    print(f"judge groups {len(groups)} holding {len(owner)} ids, remainder {len(known - set(owner))}")
     if uncovered:
         print(f"\n{len(uncovered)} rules with no case row, allowed:")
         for i in uncovered:
