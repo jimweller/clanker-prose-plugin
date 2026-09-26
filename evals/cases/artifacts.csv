@@ -1,0 +1,21 @@
+__description,polarity,bullet,input,__expected1,__expected2
+emptydata-01,rewrite,PC-empty-data-structures,Baseline latency by region. us-east-2: TBD. us-west-1: TBD. eu-west-1: TBD.,not-contains:TBD,icontains:latency
+emptydata-02,rewrite,PC-empty-data-structures,"Adoption tracker. Team A, owner blank, status blank, date blank. Team B, owner blank, status blank, date blank.","not-contains:blank, status blank",icontains:Adoption
+emptydata-03,rewrite,PC-empty-data-structures,Current error budget consumption by service. All nine rows show a dash.,icontains:nine,not-contains:by service. All
+emptydata-04,rewrite,PC-empty-data-structures,The table below establishes our security baseline. Every cell reads Not Yet Measured.,not-contains:establishes,icontains:security baseline
+emptydata-05,rewrite,PC-empty-data-structures,"Cost per environment. Dev, empty. Test, empty. Stage, empty. Prod, empty.",not-contains:empty. Test,icontains:cost
+emptydata-06,rewrite,PC-empty-data-structures,Risk register for the migration. No rows have been entered.,not-contains:No rows have been entered,icontains:Risk register
+emptydata-07,rewrite,PC-empty-data-structures,"Our quarterly reliability scorecard, with all four quarters pending.","not-contains:, with all four",icontains:four quarters
+emptydata-08,preserve,PC-empty-data-structures,Blank template. Copy this table into a new page and fill one row per service before the review.,icontains:Blank template,
+emptydata-09,preserve,PC-empty-data-structures,Baseline latency by region. us-east-2 measures 41 ms. The other two regions are unmeasured because we have no access grant.,icontains:41 ms,
+emptydata-10,preserve,PC-empty-data-structures,Risk register for the migration. The first entry is due from Platform on 9/30 and nothing has been filed yet.,icontains:9/30,
+roundtrip-01,rewrite,PC-round-trip-damage,Defaultpython import json from pathlib import Path Copy code,not-contains:Copy code,icontains:import json
+roundtrip-02,rewrite,PC-round-trip-damage,Run the installer with ./install then check the symlinks  and restart the shell.,icontains:install,
+roundtrip-03,rewrite,PC-round-trip-damage,"The steps are - fetch the manifest - link the configs - load the agents, all on one line now.",icontains:manifest,
+roundtrip-04,rewrite,PC-round-trip-damage,bashset -euo pipefail exec claude -p --output-format text,not-contains:bashset,icontains:pipefail
+roundtrip-05,rewrite,PC-round-trip-damage,users** and issues session JWTs. Its only credential is a shared hash salt.,not-contains:users**,icontains:JWTs
+roundtrip-06,rewrite,PC-round-trip-damage,See the runbook at  for the rotation procedure.,icontains:rotation,
+roundtrip-07,rewrite,PC-round-trip-damage,note 27e17abb-759d-4f1c-8444 panel_c1 This page inventories what is reachable through the asset.,not-contains:panel_c1,icontains:inventories
+roundtrip-08,preserve,PC-round-trip-damage,The resolver calls `getProviders` and then `icmDocumentation` on the same connection.,icontains:getProviders,
+roundtrip-09,preserve,PC-round-trip-damage,"Set `DOCKER_HOST` before running `pg-container.sh`, because Colima does not export it.",icontains:DOCKER_HOST,
+roundtrip-10,preserve,PC-round-trip-damage,The one-line check is `readlink ~/.serena/serena_config.yml` after any upgrade.,icontains:readlink,

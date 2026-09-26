@@ -1,0 +1,33 @@
+{
+  "_note": "Rules a regex pass detects poorly or not at all, split into small themed groups. Anthropic's eval guidance is to grade each dimension with an isolated judge rather than one judge holding every dimension, so no group carries more than seven rules. Entries are PC- ids, which open each rule's bullet inside <prose-contract> in the global instructions.",
+  "rhythm": [
+    "PC-landing-beats",
+    "PC-parallel-triads",
+    "PC-verbless-fragments",
+    "PC-synonym-cycling"
+  ],
+  "claim-scope": [
+    "PC-gnomic-restatement",
+    "PC-evidential-status",
+    "PC-self-certifying",
+    "PC-speculative-gap-filling",
+    "PC-pre-emptive-intent",
+    "PC-hedging-adjuncts"
+  ],
+  "hidden-actor": [
+    "PC-abstract-nouns-as-actors",
+    "PC-agentless-passive",
+    "PC-displacing-negation",
+    "PC-coordination",
+    "PC-synthetic-negation"
+  ],
+  "pointers-and-padding": [
+    "PC-unanchored-definite",
+    "PC-trailing-anaphora",
+    "PC-anaphoric-postmodifiers",
+    "PC-trailing-supplements",
+    "PC-negative-space-padding",
+    "PC-cross-format-duplication",
+    "PC-phantom-foil"
+  ]
+}

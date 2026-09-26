@@ -1,0 +1,5 @@
+Use the prose skill to rewrite the text between the markers. Print the rewrite and nothing else.
+
+<<<SOURCE>>>
+{{input}}
+<<<END>>>

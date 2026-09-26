@@ -1,0 +1,14 @@
+Write one paragraph presenting the facts between the markers, following the prose contract. State every fact on the sheet once. Add no fact the sheet does not carry, and drop none of them, including a number, a date, a modal, a scope, or a hedge.
+
+When the paragraph is finished, write your notes to {{notes}}, one line per decision, fields separated by a pipe.
+
+VIOLATED | PC-id | the span you would have written by default | what you wrote instead
+NOT VIOLATED | PC-id | the span that looks like it could break a rule | why it does not
+
+Write a NOT VIOLATED line for every fact on the sheet that tempts a rule. A fact that tempts nothing needs no line.
+
+The notes belong in that file only. Print the paragraph and nothing else.
+
+<<<FACTS>>>
+{{input}}
+<<<END>>>

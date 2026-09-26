@@ -1,0 +1,151 @@
+__description,polarity,bullet,input,__expected1,__expected2
+gnomic-01,rewrite,PC-gnomic-restatement,The nightly job dropped 400 rows on Tuesday. A pipeline that writes before it validates hands the next run a corrupt partition.,not-contains:A pipeline that,icontains:400
+gnomic-02,rewrite,PC-gnomic-restatement,We reverted the schema change on Friday. Any migration whose rollback is only tested in staging carries the same risk.,not-contains:Any migration whose,icontains:Friday
+gnomic-03,rewrite,PC-gnomic-restatement,Three of the eleven runbooks name no owner. An unowned runbook is not a runbook.,not-contains:An unowned runbook,icontains:eleven
+gnomic-04,rewrite,PC-gnomic-restatement,"The queue backed up to 90,000 messages overnight. Collapsing retry and dead-letter into one topic makes the consumer grade its own homework.",not-contains:Collapsing retry,"icontains:90,000"
+gnomic-05,rewrite,PC-gnomic-restatement,Two teams adopted the linter and both disabled the strictest rule. Every rule a team can switch off is a suggestion.,not-contains:Every rule a team,icontains:Two teams
+gnomic-06,rewrite,PC-gnomic-restatement,The cache served stale data for six hours. A TTL only converts stale into stale for a bounded window.,not-contains:A TTL only converts,icontains:six hours
+gnomic-07,rewrite,PC-gnomic-restatement,We found the credential in the deploy repo. A secret that lives in git history is already public.,not-contains:A secret that lives,icontains:deploy repo
+gnomic-08,preserve,PC-gnomic-restatement,A failed probe is not a healthy pod. Treat a timeout as a failure everywhere in this document.,icontains:timeout,
+gnomic-09,preserve,PC-gnomic-restatement,"A search that returns nothing means the term was absent from the four repos checked on this branch, not that it is absent everywhere.",icontains:four repos,
+gnomic-10,preserve,PC-gnomic-restatement,"If a queue drains after conversion, the boundary was never the problem.",icontains:queue drains,
+foil-01,preserve,PC-phantom-foil,The installer now writes the lockfile atomically rather than in place.,icontains:in place,icontains:lockfile
+foil-02,rewrite,PC-phantom-foil,We shipped the fix as a config flag instead of a rewrite of the scheduler.,not-contains:instead of,icontains:config flag
+foil-03,rewrite,PC-phantom-foil,"The runbook guides the operator, not merely a checklist to tick through.",not-contains:not merely,icontains:runbook
+foil-04,rewrite,PC-phantom-foil,"This is a measurement, not a guess.",not-contains:not a guess,
+foil-05,rewrite,PC-phantom-foil,The installer verifies the checksum instead of trusting the CDN ETag header.,not-contains:instead of,icontains:checksum
+foil-06,rewrite,PC-phantom-foil,"Treat the output as evidence, less a summary than a transcript.",not-contains:less a,icontains:transcript
+foil-07,preserve,PC-phantom-foil,The scheduler drops the job rather than retrying forever.,icontains:retry,icontains:drops
+foil-08,preserve,PC-phantom-foil,We picked Postgres instead of DynamoDB. DynamoDB was the incumbent and the migration plan assumed we would keep it.,icontains:DynamoDB,
+foil-09,preserve,PC-phantom-foil,"The threshold is 10 MB of body, not 10 MB of request. A multipart upload with three parts passes the first check and fails the second.",icontains:multipart,
+foil-10,preserve,PC-phantom-foil,Run the pre-flight query rather than trusting the table above. The table is hand-maintained and was last touched in March.,icontains:March,
+dispneg-01,rewrite,PC-displacing-negation,The permission change does not reduce this account's access.,not-contains:does not reduce,icontains:account
+dispneg-02,rewrite,PC-displacing-negation,Raising the timeout will not shorten the stall.,not-contains:will not shorten,icontains:stall
+dispneg-03,rewrite,PC-displacing-negation,The new index never touches the write path.,not-contains:never touches,icontains:index
+dispneg-04,rewrite,PC-displacing-negation,Enabling the flag fails to change behaviour for existing tenants.,not-contains:fails to change,icontains:tenants
+dispneg-05,rewrite,PC-displacing-negation,The rollback script leaves the dropped column unrecovered.,not-contains:unrecovered,icontains:column
+dispneg-06,rewrite,PC-displacing-negation,Nothing in the patch affects the scheduler.,not-contains:Nothing in the patch,icontains:scheduler
+dispneg-07,rewrite,PC-displacing-negation,The audit turned up no finding against the storage tier.,not-contains:no finding,icontains:storage tier
+dispneg-08,preserve,PC-displacing-negation,No test covers the retry path.,icontains:No test,
+dispneg-09,preserve,PC-displacing-negation,Never force push to a shared branch.,icontains:Never force push,
+dispneg-10,preserve,PC-displacing-negation,The vendor claims the connector is idempotent. It is not. A replayed batch doubles every row.,icontains:doubles,
+coord-01,rewrite,PC-coordination,"The build cache was pruned on Monday, and the CI queue depth halved the same afternoon.",icontains:Monday,icontains:queue depth
+coord-02,rewrite,PC-coordination,"The agent writes the manifest, but the operator has to approve it before anything applies.",icontains:manifest,icontains:operator
+coord-03,rewrite,PC-coordination,"We pinned the base image, and the CVE count fell from 4,041 to 118.",icontains:118,
+coord-04,rewrite,PC-coordination,"The linter flags the pattern, yet the pre-commit hook lets it through.",icontains:pre-commit,
+coord-05,rewrite,PC-coordination,"Two services emit the metric, and the dashboard reads only one of them.",icontains:dashboard,
+coord-06,rewrite,PC-coordination,"The rotation is scheduled for the ninth, and the freeze starts on the seventh.",icontains:seventh,
+coord-07,rewrite,PC-coordination,"The runner owns the TCC grant, but launchd invokes the shell instead.",icontains:launchd,
+coord-08,preserve,PC-coordination,The installer reads and validates the config before it writes anything.,icontains:validates,
+coord-09,preserve,PC-coordination,"The probe times out after 30 seconds, so the orchestrator marks the pod unhealthy.",icontains:30 seconds,
+coord-10,preserve,PC-coordination,"Pin the base image first, because the scan runs against whatever digest is current at build time.",icontains:digest,
+passive-01,rewrite,PC-agentless-passive,The stale entries are evicted from the cache by the sweeper.,not-contains:are evicted,icontains:sweeper
+passive-02,rewrite,PC-agentless-passive,Malformed payloads are rejected at the boundary by the schema validator.,not-contains:are rejected,icontains:schema validator
+passive-03,rewrite,PC-agentless-passive,The report is generated nightly from the warehouse by a scheduled query.,not-contains:is generated,icontains:scheduled query
+passive-04,rewrite,PC-agentless-passive,Duplicate rows are collapsed in the silver layer through the merge step.,not-contains:are collapsed,icontains:merge step
+passive-05,rewrite,PC-agentless-passive,The token is minted for each request by the sidecar.,not-contains:is minted,icontains:sidecar
+passive-06,rewrite,PC-agentless-passive,These findings were triaged in September by the platform team.,not-contains:were triaged,icontains:platform team
+passive-07,rewrite,PC-agentless-passive,The threshold is enforced at deploy time through the admission controller.,not-contains:is enforced,icontains:admission controller
+passive-08,preserve,PC-agentless-passive,The file was corrupted.,icontains:corrupted,
+passive-09,preserve,PC-agentless-passive,The partition was created in 2021 and nobody has claimed it since.,icontains:2021,
+passive-10,preserve,PC-agentless-passive,The eight events have aged out of retention and can no longer be re-checked.,icontains:retention,
+abstract-01,rewrite,PC-abstract-nouns-as-actors,Adoption stalled in the third quarter.,not-contains:Adoption stalled,icontains:third quarter
+abstract-02,rewrite,PC-abstract-nouns-as-actors,Alignment happens in the Thursday review.,not-contains:Alignment happens,icontains:Thursday
+abstract-03,rewrite,PC-abstract-nouns-as-actors,The migration decided to keep the old schema.,not-contains:The migration decided,icontains:schema
+abstract-04,rewrite,PC-abstract-nouns-as-actors,Onboarding waits for the security sign-off.,not-contains:Onboarding waits,icontains:security
+abstract-05,rewrite,PC-abstract-nouns-as-actors,Remediation arrives after the audit closes.,not-contains:Remediation arrives,icontains:audit
+abstract-06,rewrite,PC-abstract-nouns-as-actors,Ownership of the runbook drifted twice this year.,not-contains:Ownership of the runbook,icontains:twice
+abstract-07,rewrite,PC-abstract-nouns-as-actors,The learning waits for the end of the batch.,not-contains:The learning waits,
+abstract-08,preserve,PC-abstract-nouns-as-actors,Adoption is at 12 percent.,icontains:12 percent,
+abstract-09,preserve,PC-abstract-nouns-as-actors,The migration is complete on four of the nine tables.,icontains:four of the nine,
+abstract-10,preserve,PC-abstract-nouns-as-actors,"Documentation uniformity from templated exports makes drift detection harder, because every page now opens the same way.",icontains:templated exports,
+tsupp-01,rewrite,PC-trailing-supplements,"The harness loads at startup, resident until the process exits.","not-contains:, resident",icontains:startup
+tsupp-02,rewrite,PC-trailing-supplements,"The agent resolves the config from disk, wherever it starts.",not-contains:wherever,icontains:disk
+tsupp-03,rewrite,PC-trailing-supplements,"The sweeper runs every fifteen minutes, which means a deleted blob can linger.","not-contains:, which means",icontains:fifteen
+tsupp-04,rewrite,PC-trailing-supplements,"The plugin ships enabled, assuming the marketplace entry resolves.","not-contains:, assuming",icontains:plugin
+tsupp-05,rewrite,PC-trailing-supplements,"We cut the p95 to 400 ms, leaving the p99 untouched.","not-contains:, leaving",icontains:400 ms
+tsupp-06,rewrite,PC-trailing-supplements,"The scanner reads every retained digest, which is a registry with 900 images in it.","not-contains:, which is",icontains:900
+tsupp-07,rewrite,PC-trailing-supplements,"The grant is keyed to the binary path, making a rebuild a re-prompt.","not-contains:, making",icontains:rebuild
+tsupp-08,preserve,PC-trailing-supplements,"The query returned 1,000 log lines (1,000 returned, query cap reached).",icontains:query cap,
+tsupp-09,preserve,PC-trailing-supplements,"Run the bootstrap on every tier except prod, where the roles already exist.",icontains:prod,
+tsupp-10,preserve,PC-trailing-supplements,"The p95 fell to 400 ms, measured over the seven days after the index landed.",icontains:seven days,
+tanaph-01,rewrite,PC-trailing-anaphora,The ticket had been open eleven days at that point.,not-contains:at that point,icontains:eleven
+tanaph-02,rewrite,PC-trailing-anaphora,Three services were still degraded by then.,not-contains:by then,icontains:Three
+tanaph-03,rewrite,PC-trailing-anaphora,The pipeline was red at the time.,not-contains:at the time,icontains:pipeline
+tanaph-04,rewrite,PC-trailing-anaphora,Only two of the nine tables had cut over as of that date.,not-contains:as of that date,icontains:nine
+tanaph-05,rewrite,PC-trailing-anaphora,The cache hit rate sat at 4 percent in that case.,not-contains:in that case,icontains:4 percent
+tanaph-06,rewrite,PC-trailing-anaphora,Nobody owned the alert at this stage.,not-contains:at this stage,icontains:alert
+tanaph-07,rewrite,PC-trailing-anaphora,The freeze was already in effect by that time.,not-contains:by that time,icontains:freeze
+tanaph-08,preserve,PC-trailing-anaphora,The job failed on Tuesday.,icontains:Tuesday,
+tanaph-09,preserve,PC-trailing-anaphora,The ticket had been open eleven days on 8/14.,icontains:8/14,
+tanaph-10,preserve,PC-trailing-anaphora,Three services were degraded during the 03:10 window.,icontains:03:10,
+apost-01,rewrite,PC-anaphoric-postmodifiers,Nobody questioned the four hours a week behind it.,not-contains:behind it,icontains:four hours
+apost-02,rewrite,PC-anaphoric-postmodifiers,The number underneath that has never been audited.,not-contains:underneath that,
+apost-03,rewrite,PC-anaphoric-postmodifiers,The assumption driving it was never written down.,not-contains:driving it,
+apost-04,rewrite,PC-anaphoric-postmodifiers,The team inherited the 40 GB of logs behind this.,not-contains:behind this,icontains:40 GB
+apost-05,rewrite,PC-anaphoric-postmodifiers,"We priced the six engineer-weeks implied by that at 90,000 dollars.",not-contains:implied by that,"icontains:90,000"
+apost-06,rewrite,PC-anaphoric-postmodifiers,The dependency underlying it ships from a single maintainer.,not-contains:underlying it,icontains:maintainer
+apost-07,rewrite,PC-anaphoric-postmodifiers,The 12 percent gap explained by this is still open.,not-contains:explained by this,icontains:12 percent
+apost-08,preserve,PC-anaphoric-postmodifiers,Nobody questioned the four hours a week the review consumes.,icontains:four hours,
+apost-09,preserve,PC-anaphoric-postmodifiers,The dependency underlying the parser ships from a single maintainer.,icontains:parser,
+apost-10,preserve,PC-anaphoric-postmodifiers,The 12 percent gap between the two counts comes from sparse-file accounting.,icontains:sparse-file,
+unanch-01,rewrite,PC-unanchored-definite,The learning waits for the end.,not-contains:The learning,
+unanch-02,rewrite,PC-unanchored-definite,After the cutover the alert stopped firing.,not-contains:After the cutover,icontains:alert
+unanch-03,rewrite,PC-unanchored-definite,Once the review lands we can close the epic. Security owns the review and has had the design doc since Monday.,icontains:Security,icontains:Monday
+unanch-04,rewrite,PC-unanchored-definite,The tradeoff has not been written down anywhere. It is a shorter cache TTL against more Datahub reads.,icontains:Datahub,icontains:TTL
+unanch-05,rewrite,PC-unanchored-definite,Neither changes what the service does at runtime.,not-contains:Neither changes,icontains:runtime
+unanch-06,rewrite,PC-unanchored-definite,Both stalled in review for most of August. The two tickets were IS-1039 and IS-1042.,icontains:IS-1039,icontains:August
+unanch-07,rewrite,PC-unanchored-definite,This is why the number moved. The base image was repinned on the ninth and the CVE count fell to 118.,icontains:118,icontains:base image
+unanch-08,preserve,PC-unanchored-definite,The end of the batch is where the reconciliation runs.,icontains:reconciliation,
+unanch-09,preserve,PC-unanchored-definite,After the cutover to Postgres the alert stopped firing.,icontains:Postgres,
+unanch-10,preserve,PC-unanchored-definite,The tradeoff between a shorter TTL and Datahub load is recorded on IS-1039.,icontains:IS-1039,
+evid-01,rewrite,PC-evidential-status,The cost is measured. Four of the thirty-three teams pay it.,not-contains:is measured,icontains:thirty-three
+evid-02,rewrite,PC-evidential-status,The gap is documented. It has been open since March.,not-contains:is documented,icontains:March
+evid-03,rewrite,PC-evidential-status,The pattern holds. Six of the eight runs failed the same assertion.,not-contains:The pattern holds,icontains:Six
+evid-04,rewrite,PC-evidential-status,The numbers are stark. Throughput fell 40 percent after the upgrade.,not-contains:are stark,icontains:40 percent
+evid-05,rewrite,PC-evidential-status,The tradeoff is real. A shorter TTL triples Datahub reads.,not-contains:is real,icontains:triples
+evid-06,rewrite,PC-evidential-status,Five obligations follow from the contract change.,not-contains:Five obligations follow,
+evid-07,rewrite,PC-evidential-status,Three options exist below.,not-contains:Three options exist,
+evid-08,preserve,PC-evidential-status,"Two things stay unverified. The reserve constant is bracketed rather than read, and the default percentage is inferred from the cluster.",icontains:reserve constant,
+evid-09,preserve,PC-evidential-status,This is strong evidence that the model captures the main structure.,icontains:strong evidence,
+evid-10,preserve,PC-evidential-status,"The count is 14 within the sample of 69 pages, and nothing outside that sample was read.",icontains:69 pages,
+selfcert-01,rewrite,PC-self-certifying,"This was a genuine, deliberate scope increase.",not-contains:genuine,
+selfcert-02,rewrite,PC-self-certifying,The honest answer is that we never ran the restore.,not-contains:honest answer,icontains:restore
+selfcert-03,rewrite,PC-self-certifying,These numbers are empirically validated and not theoretical.,not-contains:empirically validated,
+selfcert-04,rewrite,PC-self-certifying,We are flagging this here rather than glossing over it.,not-contains:glossing over,
+selfcert-05,rewrite,PC-self-certifying,"This is a concrete, real decision about the routing target.",not-contains:concrete,icontains:routing
+selfcert-06,rewrite,PC-self-certifying,The recommendation rests on a rigorous and defensible reading of the logs.,not-contains:rigorous,icontains:logs
+selfcert-07,rewrite,PC-self-certifying,We made a deliberate and considered choice to skip the migration test.,not-contains:deliberate and considered,icontains:migration test
+selfcert-08,preserve,PC-self-certifying,We skipped the migration test because the fixture database takes four hours to build.,icontains:four hours,
+selfcert-09,preserve,PC-self-certifying,We never ran the restore. Backups exist and none has been restored.,icontains:Backups exist,
+selfcert-10,preserve,PC-self-certifying,The scope grew by two tickets on 8/19 when Platform asked for the gateway change.,icontains:8/19,
+intent-01,rewrite,PC-pre-emptive-intent,The column is empty by design.,not-contains:by design,icontains:column
+intent-02,rewrite,PC-pre-emptive-intent,"That is a decision, not an omission.",not-contains:not an omission,
+intent-03,rewrite,PC-pre-emptive-intent,"Leaving the value unchanged is correct, not a skipped step.",not-contains:not a skipped step,
+intent-04,rewrite,PC-pre-emptive-intent,We deliberately did not ticket the cost item.,not-contains:deliberately,icontains:cost item
+intent-05,rewrite,PC-pre-emptive-intent,"One sample per gate, on purpose.",not-contains:on purpose,icontains:sample
+intent-06,rewrite,PC-pre-emptive-intent,"That distribution is accurate, not a gap in the data.",not-contains:not a gap,
+intent-07,rewrite,PC-pre-emptive-intent,The absence of a DR section here is intentional.,not-contains:intentional,icontains:DR
+intent-08,preserve,PC-pre-emptive-intent,The column is empty because the source system stopped emitting it in June and nobody has backfilled.,icontains:June,
+intent-09,preserve,PC-pre-emptive-intent,"We left the threshold at 400,000 on purpose, recorded on IS-1039, because it doubles as a manual gauge.",icontains:IS-1039,
+intent-10,preserve,PC-pre-emptive-intent,"One sample per gate, because the cache that makes the arms comparable serves the identical string to every run.",icontains:identical string,
+spec-01,rewrite,PC-speculative-gap-filling,The outage is believed to have started around 02:00.,not-contains:believed to have,icontains:02:00
+spec-02,rewrite,PC-speculative-gap-filling,The drift likely began after the June release.,not-contains:likely began,icontains:June
+spec-03,rewrite,PC-speculative-gap-filling,The maintainer appears to have abandoned the package.,not-contains:appears to have,icontains:package
+spec-04,rewrite,PC-speculative-gap-filling,The team presumably reviewed the change before merging.,not-contains:presumably,icontains:merg
+spec-05,rewrite,PC-speculative-gap-filling,The two counts differ because the exporter deduplicates and the importer does not.,icontains:counts differ,
+spec-06,rewrite,PC-speculative-gap-filling,The files pass the 25 MiB gate through a path the upload check does not cover.,icontains:25 MiB,
+spec-07,rewrite,PC-speculative-gap-filling,The service maintains a relatively low error rate in production.,not-contains:relatively low,icontains:error rate
+spec-08,preserve,PC-speculative-gap-filling,The source does not say how a 30 MiB file passed the 25 MiB gate.,icontains:25 MiB,
+spec-09,preserve,PC-speculative-gap-filling,The record has no entry for a scan. That is not proof the scan never ran.,icontains:not proof,not-contains:may
+spec-10,preserve,PC-speculative-gap-filling,"The outage started at 02:04 according to the first alert, and the logs before 02:00 have aged out.",icontains:02:04,
+hedge-01,rewrite,PC-hedging-adjuncts,"The migration succeeded, at least in part.",not-contains:at least in part,icontains:migration
+hedge-02,rewrite,PC-hedging-adjuncts,"The design is sound, on its own terms.",not-contains:on its own terms,
+hedge-03,rewrite,PC-hedging-adjuncts,In a sense the rollback worked.,not-contains:In a sense,icontains:rollback
+hedge-04,rewrite,PC-hedging-adjuncts,"The alert fired, more or less on schedule.",not-contains:more or less,icontains:alert
+hedge-05,rewrite,PC-hedging-adjuncts,"If anything, the p95 improved after the change.",not-contains:If anything,icontains:p95
+hedge-06,rewrite,PC-hedging-adjuncts,To some extent the gate is already satisfied.,not-contains:To some extent,icontains:gate
+hedge-07,rewrite,PC-hedging-adjuncts,Arguably the network boundary is doing the work here.,not-contains:Arguably,icontains:network boundary
+hedge-08,preserve,PC-hedging-adjuncts,Four of the nine tables cut over. The other five were not attempted.,icontains:five,
+hedge-09,preserve,PC-hedging-adjuncts,The p95 improved from 900 ms to 400 ms within the sample of seven days.,icontains:seven days,
+hedge-10,preserve,PC-hedging-adjuncts,"The reserve is bracketed between 29,311 and 33,234, so 30,000 remains a candidate alongside 32,000.","icontains:30,000",

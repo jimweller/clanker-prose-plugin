@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+# Pass one of the launder set. Judges every prose paragraph in the pool so pass
+# two can keep the ones that read as machine output.
+#
+# The set is chosen by the judge rather than by a marker heuristic. An earlier
+# version ranked on marker density and counted label-colon among the markers,
+# which selected scorecards and rubrics written as paragraphs.
+description: Launder pool, judging candidates for selection
+commandLineOptions:
+  repeat: 3
+  maxConcurrency: 14
+prompts:
+  - file://prompts/passage.txt
+providers:
+  - id: exec:./providers/select-judge.sh
+    label: selector
+tests:
+  - file://corpus/launder-pool.csv

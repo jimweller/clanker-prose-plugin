@@ -1,0 +1,3 @@
+# Raw Confluence bodies carry internal content and both repos that hold this
+# suite are public. Only scrubbed cases promoted into cases/*.csv get committed.
+corpus/

@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Ghostwriting contract, prose skill
+
+# The model is non-deterministic and a bullet carries about ten cases, so one
+# pass per case cannot separate a rule improvement from noise. Three full runs
+# of this suite scored 94, 97 and 96 percent, and between the second and third
+# `praise adjectives` moved from 100 to 70 on cases nobody had touched.
+#
+# Three repeats is the day-to-day default, which is what a filtered run costs.
+# Pass --repeat 1 when you only want a broken-case check, and use
+# tools/measure-bullet.sh at five repeats before claiming a rule edit worked.
+# Concurrency was swept on 96 cases. A solo call takes 10s, and a wave takes 15s
+# at -j 16, 29s at -j 32 and 50s at -j 48, so wave time grows in step with the
+# fan-out above 16 and throughput sits flat near eleven effective workers. Each
+# case spawns a full claude -p process that loads the whole CLI, so the cap is
+# process cost rather than tokens. 14 sits in the middle of the plateau.
+commandLineOptions:
+  repeat: 3
+  maxConcurrency: 14
+
+prompts:
+  - file://prompts/rewrite.txt
+
+providers:
+  - id: exec:./providers/deployed.sh
+    label: deployed
+
+# Only four marks carry no exemption anywhere in the catalog, so only those four
+# are safe to assert on every case. Every other bullet needs a per-row assertion
+# because a blanket ban would fail correct output.
+defaultTest:
+  assert:
+    - type: javascript
+      value: file://graders/banned-literals.js
+    - type: javascript
+      value: file://graders/no-prose-colon.js
+    - type: javascript
+      value: file://graders/length-guard.js
+
+tests:
+  - file://cases/sentences.csv
+  - file://cases/paragraphs.csv
+  - file://cases/register.csv
+  - file://cases/judgment.csv
+  - file://cases/mechanics.csv
+  - file://cases/closing.csv
+  - file://cases/artifacts.csv

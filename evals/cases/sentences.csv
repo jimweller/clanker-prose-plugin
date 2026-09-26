@@ -1,0 +1,62 @@
+__description,polarity,bullet,input,__expected1,__expected2
+emdash-second-beat,rewrite,PC-emdashes,The installer writes the config before it checks permissions — a failed check leaves a half-written file.,icontains:half-written,icontains:permissions
+emdash-ordered-sequence,rewrite,PC-emdashes,"The job runs three steps — fetch, transform, load — and then exits.",icontains:transform,icontains:exits
+double-hyphen,rewrite,PC-emdashes,The build passes on Linux -- it fails on Windows.,icontains:Windows,
+semicolon-splice,rewrite,PC-semicolons,The scheduler retries three times; it then drops the job.,icontains:three,
+semicolon-list-separator,rewrite,PC-semicolons,"The agents are backup, which runs nightly; logrotate, which runs at 3:30; and steampipe, which runs at login.",icontains:logrotate,icontains:steampipe
+prose-colon-splice,rewrite,PC-colons,Two grants are needed: the Drive domain and OneDrive-Hearst.,icontains:OneDrive-Hearst,
+prose-colon-lead-in,rewrite,PC-colons,"Three git profiles exist: jim, work, and hearst.",icontains:hearst,
+label-colon-prefix,rewrite,PC-label-colon-prefixes,Honest status: the migration is three weeks behind.,not-contains:Honest status,icontains:three weeks
+label-as-subject,rewrite,PC-labels-as-subject,The biggest risk is confusing the fixture objects with the production objects.,not-contains:biggest risk,icontains:fixture
+marker-substitution,rewrite,PC-marker-substitution,"DEVX-3716 is open, because everything built was tooling or a fixture.",not-contains:because,icontains:DEVX-3716
+abstract-noun-actor,rewrite,PC-abstract-nouns-as-actors,Adoption stalled in Q3 and alignment happens in the review.,not-contains:Adoption stalled,icontains:Q3
+unanchored-definite,rewrite,PC-unanchored-definite,The learning waits for the end.,not-contains:The learning,
+copula-avoidance,rewrite,PC-copula-avoidance,The runbook serves as the reference for on-call staff.,not-contains:serves as,icontains:runbook
+verbless-fragment,rewrite,PC-verbless-fragments,"Two plugins, one lab.","not-contains:Two plugins, one lab.",
+cannot-failure,rewrite,PC-cannot,The uploader cannot reach the bucket when the token expires.,not-contains:cannot,icontains:token
+synthetic-negation,rewrite,PC-synthetic-negation,DevX was invited to no planning meeting.,not-contains:no planning meeting,icontains:DevX
+displacing-negation,rewrite,PC-displacing-negation,The RBAC change does not shrink this account's reach.,not-contains:does not shrink,icontains:reach
+coordination-second-fact,rewrite,PC-coordination,"The RBAC change removes the implicit global grant every account gets, and gives this one account an explicit grant.",icontains:explicit,
+agentless-passive,rewrite,PC-agentless-passive,A real username and password is removed from the current scanner.,not-contains:is removed,icontains:scanner
+trailing-anaphor,rewrite,PC-trailing-anaphora,The request had been open eleven days at that point.,not-contains:at that point,icontains:eleven
+trailing-supplement,rewrite,PC-trailing-supplements,"The Ambient Harness loads at startup, resident until the process exits.","not-contains:, resident",icontains:startup
+anaphoric-postmodifier,rewrite,PC-anaphoric-postmodifiers,Nobody questioned the 2 to 8 hours per month behind it.,not-contains:behind it,icontains:2 to 8
+hype,rewrite,PC-hype,The new pipeline is production ready and battle tested.,not-contains:production ready,not-contains:battle tested
+praise-adjective,rewrite,PC-praise-adjectives,Adoption showed a significant improvement this quarter.,not-contains:significant,
+llm-vocab,rewrite,PC-llm-vocabulary,We leverage a robust and seamless workflow.,not-contains:leverage,not-contains:seamless
+load-bearing,rewrite,PC-load-bearing,The review is load-bearing for the release.,icontains:release,
+opposing-phrase,rewrite,PC-opposing-phrases,"It is not a linter, it is a contract.",not-contains:not a linter,
+phantom-foil-orphan,rewrite,PC-phantom-foil,The guides pair with the team rather than instruct it.,not-contains:rather than,
+gnomic-restatement,rewrite,PC-gnomic-restatement,The eighth re-org relocated the debt. An org chart that turns over faster than the work it authorizes hands each new owner a larger estate.,not-contains:An org chart that,icontains:eighth
+hedging-adjunct,rewrite,PC-hedging-adjuncts,"The migration succeeded, at least in part.",not-contains:at least in part,
+self-certifying,rewrite,PC-self-certifying,"This was a genuine, deliberate scope increase.",not-contains:genuine,
+intent-relabelling,rewrite,PC-pre-emptive-intent,"The table is empty by design, and that is a decision rather than an omission.",not-contains:by design,
+speculative-gap,rewrite,PC-speculative-gap-filling,The service is believed to have started failing in March.,not-contains:believed to have,icontains:March
+emotional-flatline,rewrite,PC-emotional-flatline,What surprised me most was that the cache never warmed.,not-contains:What surprised me,icontains:cache
+lingering-attention,rewrite,PC-lingering-attention,The line I keep coming back to is that the queue never drains.,not-contains:keep coming back,icontains:queue
+endorsement-closer,rewrite,PC-endorsement-closers,The runbook covers failover. Worth your time.,not-contains:Worth your time,icontains:failover
+narrated-candor,rewrite,PC-narrated-candor,"I want to be upfront, this is a mitigation and not a fix.",not-contains:upfront,icontains:mitigation
+acknowledgment-loop,rewrite,PC-acknowledgment-loops,You are asking about the retry path. The retry path has no test.,not-contains:You are asking,icontains:retry
+leading-subordinate,rewrite,PC-leading-subordinate,"To avoid a partial write, the installer checks permissions first.",not-contains:To avoid,icontains:permissions
+parallel-triad,rewrite,PC-parallel-triads,"The config lands in Git, the secret travels with SOPS, and the log is readable by anyone.",icontains:SOPS,
+fake-first-person,rewrite,PC-fake-first-person,When I ran this migration the queue drained first.,not-contains:When I ran,icontains:queue
+manufactured-stakes,rewrite,PC-manufactured-stakes,A slip here could make or break the quarter.,not-contains:make or break,
+tool-leak,rewrite,PC-assistant-tool-leaks,The runbook lives at https://example.com/runbook?utm_source=chatgpt.com and covers failover.,not-contains:utm_source,icontains:failover
+signpost-label,rewrite,PC-interrogative-signposts,What changed. The scheduler now retries three times.,not-contains:What changed,icontains:three
+generic-opening,rewrite,PC-generic-openings,"In today's rapidly evolving landscape, the scheduler retries three times.",not-contains:evolving landscape,icontains:three
+filler-transition,rewrite,PC-filler-transitions,"The job failed. Moreover, the log was empty.",not-contains:Moreover,icontains:log
+document-history,rewrite,PC-document-history,"The Ambient Harness, formerly known as the Sidecar, loads at startup.",not-contains:formerly known,icontains:startup
+evidential-status,rewrite,PC-evidential-status,The cost is measured. Four of the thirty-three teams pay it.,not-contains:is measured,icontains:thirty-three
+computed-number,rewrite,PC-computed-number,"The archive held 24 of the 64 weeks, which is more than a third.",not-contains:more than a third,icontains:24
+preserve-foil-named,preserve,PC-phantom-foil,The team chose Postgres instead of DynamoDB. DynamoDB was the incumbent and the migration would have kept it.,icontains:DynamoDB,
+preserve-parenthetical,preserve,PC-trailing-supplements,"The query returned 1000 log lines (1000 returned, query cap reached).",icontains:query cap,
+preserve-ordered-triad,preserve,PC-parallel-triads,"The installer fetches the manifest, links the configs, and loads the agents.",icontains:manifest,icontains:agents
+preserve-modal-cannot,preserve,PC-cannot,pdf.js cannot load a blob URL.,icontains:cannot,
+preserve-absence-negation,preserve,PC-displacing-negation,No test covers the retry path.,icontains:No test,
+preserve-calibrated-claim,preserve,PC-evidential-status,This is strong evidence that the model captures the main structure.,icontains:strong evidence,
+preserve-passive-no-actor,preserve,PC-agentless-passive,The file was corrupted.,icontains:corrupted,
+preserve-nominalization-copula,preserve,PC-abstract-nouns-as-actors,Adoption is at 12 percent.,icontains:12 percent,
+preserve-code-colon,preserve,PC-colons,Set `sops.age.recipient: age1abc` in the manifest.,icontains:recipient,
+preserve-prohibition,preserve,PC-displacing-negation,Never force push to a shared branch.,icontains:Never,
+preserve-glyph-subject,preserve,PC-emojis-and-glyphs,The banner renders a green circle when the check passes.,icontains:green circle,
+preserve-domain-term,preserve,PC-llm-vocabulary,Keycloak groups its clients into realms.,icontains:realms,

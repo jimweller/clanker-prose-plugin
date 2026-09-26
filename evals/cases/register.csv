@@ -1,0 +1,121 @@
+__description,polarity,bullet,input,__expected1,__expected2
+generic-open-01,rewrite,PC-generic-openings,"In today's rapidly evolving landscape, our deployment pipeline needs a rethink. The nightly build has failed nine times this month.",not-contains:evolving landscape,icontains:nine
+generic-open-02,rewrite,PC-generic-openings,"As organizations increasingly embrace cloud-native architectures, we should revisit the Colima setup. It breaks on every macOS point release.",not-contains:increasingly embrace,icontains:Colima
+generic-open-03,rewrite,PC-generic-openings,"In an era where developer experience is paramount, the onboarding doc is out of date. Four of the eleven steps no longer apply.",not-contains:In an era,icontains:eleven
+generic-open-04,rewrite,PC-generic-openings,"With the pace of change accelerating across the industry, here is where the migration stands. Two tables are cut over and six are not.",not-contains:pace of change,icontains:six
+generic-open-05,rewrite,PC-generic-openings,"Now more than ever, secrets hygiene matters. We found a committed PAT in the deploy repo on Tuesday.",not-contains:Now more than ever,icontains:Tuesday
+generic-open-06,rewrite,PC-generic-openings,"In the modern software development lifecycle, code review is critical. Ours takes a median of four days.",not-contains:In the modern,icontains:four days
+generic-open-07,rewrite,PC-generic-openings,"Against the backdrop of tightening compliance requirements, the audit log gap needs an owner. Nobody has claimed it since March.",not-contains:Against the backdrop,icontains:March
+generic-open-08,preserve,PC-generic-openings,This note covers the three settings files and what differs between them. Everything else in the repo is unchanged.,icontains:three settings files,
+generic-open-09,preserve,PC-generic-openings,"What follows is the rollback procedure for the schema change, written for whoever is on call.",icontains:rollback procedure,
+generic-open-10,preserve,PC-generic-openings,Scope for this review is the auth middleware only. The token refresh path is being handled on a separate ticket.,icontains:auth middleware,
+filler-trans-01,rewrite,PC-filler-transitions,"The job failed on Tuesday. Moreover, the log was truncated at 2 MB.",not-contains:Moreover,icontains:2 MB
+filler-trans-02,rewrite,PC-filler-transitions,"The index finished building at 03:10. Furthermore, the replica caught up within the hour.",not-contains:Furthermore,icontains:replica
+filler-trans-03,rewrite,PC-filler-transitions,"We reverted the change. Additionally, we pinned the dependency to the previous minor.",not-contains:Additionally,icontains:pinned
+filler-trans-04,rewrite,PC-filler-transitions,"The scan found nothing in application source. Notably, it does not cover the container base image.",not-contains:Notably,icontains:base image
+filler-trans-05,rewrite,PC-filler-transitions,"Three teams have adopted the runbook. That being said, none has run the drill.",not-contains:That being said,icontains:drill
+filler-trans-06,rewrite,PC-filler-transitions,"The p95 dropped to 400 ms. In addition, error rate fell to 0.2 percent.",not-contains:In addition,icontains:0.2
+filler-trans-07,rewrite,PC-filler-transitions,The cutover is scheduled for the ninth. It is worth noting that the freeze starts on the seventh.,not-contains:worth noting,icontains:seventh
+filler-trans-08,preserve,PC-filler-transitions,"The index finished building at 03:10, so the replica caught up within the hour.",icontains:03:10,
+filler-trans-09,preserve,PC-filler-transitions,"We reverted the change. The revert did not restore the dropped column, so the backfill still has to run.",icontains:backfill,
+filler-trans-10,preserve,PC-filler-transitions,"The scan found nothing in application source. It does not cover the container base image, which is where the 4,041 CVEs live.","icontains:4,041",
+recap-flat-01,rewrite,PC-recap-flattery,"Thanks for all the legwork here, the migration script and the rollback plan you put together are what made this possible. The cutover failed on the third table because the index was still building.",not-contains:what made this possible,icontains:third table
+recap-flat-02,rewrite,PC-recap-flattery,"Really appreciate the deep dive you did on the tracing data, it was incredibly thorough and clearly took a lot of time. The p95 is still 29 seconds.",not-contains:deep dive you did,icontains:29
+recap-flat-03,rewrite,PC-recap-flattery,"First off, huge thanks for pulling together the whole dependency audit, mapping every transitive path and cross-checking the advisories. We are going to defer it to next quarter.",not-contains:huge thanks,icontains:next quarter
+recap-flat-04,rewrite,PC-recap-flattery,"Amazing work on the spike, the way you sequenced the three options and priced each one was exactly right. Option C is blocked on a credential we cannot get.",not-contains:Amazing work,icontains:Option C
+recap-flat-05,rewrite,PC-recap-flattery,Thank you so much for the detailed writeup and for chasing down every one of the open questions before the review. Two of them are still open.,not-contains:Thank you so much,icontains:Two
+recap-flat-06,rewrite,PC-recap-flattery,"I want to start by recognizing the enormous effort that went into the Q3 rollout, from the planning docs through the comms plan. The adoption number is 4 of 33 teams.",not-contains:enormous effort,icontains:4 of 33
+recap-flat-07,rewrite,PC-recap-flattery,"Great stuff in the PR, the test coverage and the naming are both a real step up from what we had. The migration still drops the audit table.",not-contains:Great stuff,icontains:audit table
+recap-flat-08,preserve,PC-recap-flattery,"Thanks for the rollback plan. The cutover failed on the third table because the index was still building, so we used it on Tuesday night.",icontains:Tuesday night,
+recap-flat-09,preserve,PC-recap-flattery,"Thanks. The p95 is still 29 seconds, so the tracing data did not point at the cause and we need the memory dump next.",icontains:memory dump,
+recap-flat-10,preserve,PC-recap-flattery,"Appreciated. Option C is blocked on a credential we cannot get, which is the thing to raise with Platform on Thursday.",icontains:Thursday,
+narr-candor-01,rewrite,PC-narrated-candor,I want to be upfront: this is a mitigation and not a fix. The underlying race is still there.,not-contains:upfront,icontains:race
+narr-candor-02,rewrite,PC-narrated-candor,"To be fully transparent, we have not tested the restore path. Backups exist and nobody has restored one.",not-contains:fully transparent,icontains:restore
+narr-candor-03,rewrite,PC-narrated-candor,"Rather than bury this, I will say it plainly: the benchmark numbers came from a single run.",not-contains:Rather than bury,icontains:single run
+narr-candor-04,rewrite,PC-narrated-candor,"Two caveats I would rather flag than let you discover later: the sample is 6 interviews, and none was a finance role.",not-contains:rather flag,icontains:6 interviews
+narr-candor-05,rewrite,PC-narrated-candor,"Being completely honest with you here, the estimate assumes the index lands first. If it slips, so does everything after it.",not-contains:completely honest,icontains:index
+narr-candor-06,rewrite,PC-narrated-candor,"In the interest of full disclosure, I reviewed my own change. Nobody else has read it.",not-contains:full disclosure,icontains:Nobody else
+narr-candor-07,rewrite,PC-narrated-candor,Let me be clear about something: the 87 percent figure covers only the pages we could read.,not-contains:Let me be clear,icontains:87 percent
+narr-candor-08,preserve,PC-narrated-candor,This is a mitigation and not a fix. The underlying race is still there and IS-1234 tracks it.,icontains:IS-1234,
+narr-candor-09,preserve,PC-narrated-candor,"Disclosure, my team owns the service this benchmarks against, so read the comparison with that in mind.",icontains:my team owns,
+narr-candor-10,preserve,PC-narrated-candor,"The sample is 6 interviews and none was a finance role, so the ROI read is directional.",icontains:6 interviews,
+ack-loop-01,rewrite,PC-acknowledgment-loops,You are asking about the retry path. The retry path has no test coverage.,not-contains:You are asking,icontains:retry
+ack-loop-02,rewrite,PC-acknowledgment-loops,"To answer your question about whether the WAF blocks anything, it is in Detection mode.",not-contains:To answer your question,icontains:Detection
+ack-loop-03,rewrite,PC-acknowledgment-loops,The question of whether we should branch first comes down to the repo convention. This repo commits on main.,not-contains:The question of whether,icontains:main
+ack-loop-04,rewrite,PC-acknowledgment-loops,"So, regarding your point about the cache TTL, it is one hour and it is shared with tenant settings.",not-contains:regarding your point,icontains:one hour
+ack-loop-05,rewrite,PC-acknowledgment-loops,You mentioned the backup runner. It is a compiled binary that owns a TCC identity.,not-contains:You mentioned,icontains:TCC
+ack-loop-06,rewrite,PC-acknowledgment-loops,"Circling back on what you raised earlier about the em-dash filter, it selects pages, not sentences.",not-contains:Circling back,icontains:pages
+ack-loop-07,rewrite,PC-acknowledgment-loops,"Before I answer, let me restate the problem. We have two contradictory agreements on the same routing question.",not-contains:let me restate,icontains:routing
+ack-loop-08,preserve,PC-acknowledgment-loops,The retry path has no test coverage. Three other paths in the same module do.,icontains:Three other paths,
+ack-loop-09,preserve,PC-acknowledgment-loops,Two different things get called the cache here. The tenant-settings cache has a one-hour TTL and the provider list has none.,icontains:one-hour,
+ack-loop-10,preserve,PC-acknowledgment-loops,"The WAF is in Detection mode, so it logs and does not block.",icontains:Detection,
+linger-01,rewrite,PC-lingering-attention,The line I keep coming back to is that the queue never drains.,not-contains:keep coming back,icontains:queue
+linger-02,rewrite,PC-lingering-attention,I cannot stop thinking about this one. Three of the five services authenticate nobody.,not-contains:stop thinking,icontains:five services
+linger-03,rewrite,PC-lingering-attention,"Still rattling around in my head a week later. The pen test ran once, in 2025, against STAGE.",not-contains:rattling around,icontains:STAGE
+linger-04,rewrite,PC-lingering-attention,This has been living rent free in my head since the review. Nobody signed the go-live checklist.,not-contains:rent free,icontains:go-live
+linger-05,rewrite,PC-lingering-attention,I have been chewing on this since Tuesday. The 1.93M row fetch happens on every ORC visit.,not-contains:chewing on this,icontains:1.93M
+linger-06,rewrite,PC-lingering-attention,Something I keep returning to. The scrub table is itself an inventory of the thing it hides.,not-contains:keep returning,icontains:scrub table
+linger-07,rewrite,PC-lingering-attention,I have thought about this more than I should have. The em-dash accounted for a quarter of all rule hits.,not-contains:more than I should,icontains:quarter
+linger-08,preserve,PC-lingering-attention,I keep coming back to the queue depth because it predicts the app-pool recycles two hours ahead.,icontains:two hours,
+linger-09,preserve,PC-lingering-attention,"The pen test ran once, in 2025, against STAGE. STAGE and PROD differ in ingress path, so the clean result does not read forward.",icontains:ingress path,
+linger-10,preserve,PC-lingering-attention,"Three of the five services authenticate nobody, and two of those three run their containers as root.",icontains:root,
+endorse-01,rewrite,PC-endorsement-closers,The runbook covers failover and credential rotation. Worth your time.,not-contains:Worth your time,icontains:failover
+endorse-02,rewrite,PC-endorsement-closers,Anthropic published a post on agent evals. A must-read.,not-contains:must-read,icontains:agent evals
+endorse-03,rewrite,PC-endorsement-closers,There is a good writeup on the Postgres bootstrap in the wiki. I highly recommend giving it a read.,not-contains:highly recommend,icontains:Postgres
+endorse-04,rewrite,PC-endorsement-closers,New page on the WAF configuration went up Friday. Do yourself a favor and read it.,not-contains:Do yourself a favor,icontains:WAF
+endorse-05,rewrite,PC-endorsement-closers,The spike on tenant routing landed. Bookmark this one.,not-contains:Bookmark,icontains:tenant routing
+endorse-06,rewrite,PC-endorsement-closers,Kevin wrote up the memory dump analysis. Do not sleep on this.,not-contains:sleep on this,icontains:memory dump
+endorse-07,rewrite,PC-endorsement-closers,There is a new template for security reviews in the space. Required reading for everyone.,not-contains:Required reading,icontains:template
+endorse-08,preserve,PC-endorsement-closers,The runbook covers failover and credential rotation. Read it before you take the pager on Monday.,icontains:Monday,
+endorse-09,preserve,PC-endorsement-closers,"The spike on tenant routing contradicts IS-811, so read it if you were referred to IS-811.",icontains:IS-811,
+endorse-10,preserve,PC-endorsement-closers,Kevin wrote up the memory dump analysis. It answers the question you asked in standup about the 1.93M rows.,icontains:1.93M,
+fake-1p-01,rewrite,PC-fake-first-person,When I ran this migration the queue drained first.,not-contains:When I ran,icontains:queue
+fake-1p-02,rewrite,PC-fake-first-person,I have seen this fail three times in production at other companies.,not-contains:I have seen,icontains:three
+fake-1p-03,rewrite,PC-fake-first-person,In my experience the connection pool is always the bottleneck here.,not-contains:In my experience,icontains:connection pool
+fake-1p-04,rewrite,PC-fake-first-person,Every time I have done a Postgres major-version upgrade the extensions break first.,not-contains:Every time I have,icontains:extensions
+fake-1p-05,rewrite,PC-fake-first-person,I have debugged a lot of TCC issues and the responsible process is nearly always the shell.,not-contains:I have debugged,icontains:responsible process
+fake-1p-06,rewrite,PC-fake-first-person,"Having run several of these audits, I can tell you the checklists are never signed.",not-contains:Having run,icontains:checklists
+fake-1p-07,rewrite,PC-fake-first-person,I remember when we hit this exact bug on the old cluster back in 2023.,not-contains:I remember when,icontains:2023
+fake-1p-08,preserve,PC-fake-first-person,I ran the bootstrap against dev on Tuesday and all four verification queries matched.,icontains:Tuesday,
+fake-1p-09,preserve,PC-fake-first-person,We reverted the change on Friday. The revert left the dropped column in place.,icontains:Friday,
+fake-1p-10,preserve,PC-fake-first-person,Alex Scott reached root cause one by memory-dump analysis on 2026-09-11.,icontains:2026-09-11,
+emo-flat-01,rewrite,PC-emotional-flatline,What surprised me most was that the cache never warmed.,not-contains:What surprised me,icontains:cache
+emo-flat-02,rewrite,PC-emotional-flatline,I was fascinated to discover that the WAF has been in Detection mode since 2022.,not-contains:fascinated to discover,icontains:2022
+emo-flat-03,rewrite,PC-emotional-flatline,What struck me was the gap between the ticket and the measurement.,not-contains:What struck me,icontains:measurement
+emo-flat-04,rewrite,PC-emotional-flatline,The most interesting part is that the internal test harness sets more security headers than the customer-facing app.,not-contains:most interesting part,icontains:headers
+emo-flat-05,rewrite,PC-emotional-flatline,Interesting thing here: the pen test exists only inside a PDF attachment.,not-contains:Interesting thing,icontains:PDF
+emo-flat-06,rewrite,PC-emotional-flatline,I found it genuinely shocking that backup restore has never been tested.,not-contains:shocking,icontains:restore
+emo-flat-07,rewrite,PC-emotional-flatline,What jumped out at me is the 39x difference in em-dash density.,not-contains:jumped out,icontains:39x
+emo-flat-08,preserve,PC-emotional-flatline,The internal test harness sets more security headers than the customer-facing app that renders clinical content.,icontains:clinical content,
+emo-flat-09,preserve,PC-emotional-flatline,Backup restore has never been tested on any service in the platform.,icontains:never been tested,
+emo-flat-10,preserve,PC-emotional-flatline,"The pen test exists only inside a PDF attachment, so anyone reading the Confluence page sees a blank body.",icontains:blank body,
+stakes-01,rewrite,PC-manufactured-stakes,Getting this index right could make or break the quarter.,not-contains:make or break,icontains:index
+stakes-02,rewrite,PC-manufactured-stakes,The next two weeks decide whether the platform survives the audit.,not-contains:whether the platform survives,icontains:audit
+stakes-03,rewrite,PC-manufactured-stakes,A mistake here costs us the account.,not-contains:costs us the account,
+stakes-04,rewrite,PC-manufactured-stakes,This is the most consequential decision the team will make this year. It concerns whether scans can fail a build.,not-contains:most consequential,icontains:fail a build
+stakes-05,rewrite,PC-manufactured-stakes,Everything downstream hinges on this one call about the cache TTL.,not-contains:Everything downstream,icontains:cache TTL
+stakes-06,rewrite,PC-manufactured-stakes,"If we get the routing wrong, the blast radius is the entire analytics estate.",not-contains:blast radius is the entire,icontains:routing
+stakes-07,rewrite,PC-manufactured-stakes,The stakes could not be higher on the credential rotation.,not-contains:stakes could not be higher,icontains:credential rotation
+stakes-08,preserve,PC-manufactured-stakes,A slip past 9/30 pushes the audit into Q1.,icontains:9/30,
+stakes-09,preserve,PC-manufactured-stakes,"The stage and prod secrets expire on 9/14 and 9/15, and all three tickets are unassigned.",icontains:unassigned,
+stakes-10,preserve,PC-manufactured-stakes,Chorus would need to double its inpatient denial rate to break even on a 350K annual cost.,icontains:350K,
+bio-claim-01,rewrite,PC-biography-claims,"As someone who has spent a decade in healthcare security, the pattern here is familiar.",not-contains:spent a decade,icontains:pattern
+bio-claim-02,rewrite,PC-biography-claims,Our team are recognised experts in FHIR conformance and we see this weekly.,not-contains:recognised experts,icontains:FHIR
+bio-claim-03,rewrite,PC-biography-claims,"Speaking as a former Postgres committer, the index choice here is wrong.",not-contains:former Postgres committer,icontains:index
+bio-claim-04,rewrite,PC-biography-claims,"With my background in HIPAA compliance work, I can confirm this qualifies as a finding.",not-contains:my background in,icontains:finding
+bio-claim-05,rewrite,PC-biography-claims,"Having led three platform migrations of this size, the sequencing is the hard part.",not-contains:Having led three,icontains:sequencing
+bio-claim-06,rewrite,PC-biography-claims,"I hold a certification in cloud security architecture, so take the WAF recommendation seriously.",not-contains:certification,icontains:WAF
+bio-claim-07,rewrite,PC-biography-claims,"As the industry's leading practitioners in this area, we recommend Option A.",not-contains:leading practitioners,icontains:Option A
+bio-claim-08,preserve,PC-biography-claims,Alex Scott owns Indicia-Core and reached root cause one from the memory dumps.,icontains:Indicia-Core,
+bio-claim-09,preserve,PC-biography-claims,The Market Insights team ran the six interviews and wrote the annotated findings.,icontains:six interviews,
+bio-claim-10,preserve,PC-biography-claims,Platform Engineering owns gateway lifecycle and states that WAF management is outside their scope.,icontains:Platform Engineering,
+doc-hist-01,rewrite,PC-document-history,"The Ambient Harness, formerly known as the Sidecar, loads at startup.",not-contains:formerly known,icontains:startup
+doc-hist-02,rewrite,PC-document-history,This page was originally called the Onboarding Guide and has since been renamed.,not-contains:originally called,
+doc-hist-03,rewrite,PC-document-history,Earlier drafts of this section used the term tenant marker. We now call it a routing classification.,not-contains:Earlier drafts,icontains:routing classification
+doc-hist-04,rewrite,PC-document-history,In previous versions of this runbook the ZPA step came first. It has been removed.,not-contains:previous versions,icontains:ZPA
+doc-hist-05,rewrite,PC-document-history,Working name for what the November template called External Security Validation. The June template drops it.,not-contains:Working name,icontains:June
+doc-hist-06,rewrite,PC-document-history,Note: this table was restructured on 2026-08-12 and the Owner column is new.,not-contains:was restructured,icontains:Owner
+doc-hist-07,rewrite,PC-document-history,The section below replaces what used to be three separate pages.,not-contains:used to be,
+doc-hist-08,preserve,PC-document-history,"The June 2026 template drops four sections the November 2025 template carried, and does not state that it supersedes it.",icontains:November 2025,
+doc-hist-09,preserve,PC-document-history,"The runner will be rebuilt only when backup-runner.c is newer, because a rebuild voids the TCC grants.",icontains:TCC,
+doc-hist-10,preserve,PC-document-history,CSS-111 and CSS-113 predate the 2026-09-03 re-measurement and should be closed rather than re-run.,icontains:CSS-111,

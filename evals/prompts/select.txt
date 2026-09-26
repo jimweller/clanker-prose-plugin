@@ -1,0 +1,27 @@
+Read the paragraph and sort it into one of three piles.
+
+It needs rewriting if it is prose and it reads as machine output, or if it is padded, templated, or badly written by any hand.
+
+It is worth leaving alone if it is prose and a careful person wrote it, so a careful editor would change little.
+
+It is not prose at all if it is a data dump, an export, a task table, a scorecard, a bare list of fields, or anything whose real form is a table. Bare identifiers, status tokens, and entries breaking off mid-clause are the signs. A prose contract cannot rewrite these and must not be scored on them.
+
+Judge the writing. Ignore subject matter and ignore whether the content is correct.
+
+Give your reasoning first, in no more than two sentences, quoting the words that decided it. Then end with a line reading exactly
+
+VERDICT rewrite
+
+or
+
+VERDICT leave
+
+or
+
+VERDICT skip
+
+Write nothing after that line.
+
+<<<PARAGRAPH>>>
+{{passage}}
+<<<END>>>

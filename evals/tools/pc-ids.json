@@ -1,0 +1,518 @@
+{
+ "rules": [
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 0,
+   "id": "PC-emdashes",
+   "lead": "emdashes and double-hyphens (`--` is just a sneaky emdash)"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 1,
+   "id": "PC-marker-substitution",
+   "lead": "marker substitution that manufactures a claim"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 2,
+   "id": "PC-emojis-and-glyphs",
+   "lead": "emojis, glyphs, and ligatures as prose"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 3,
+   "id": "PC-hype",
+   "lead": "hype, effusive or boastful language (production ready, battle tested, "
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 4,
+   "id": "PC-manufactured-stakes",
+   "lead": "manufactured stakes"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 5,
+   "id": "PC-load-bearing",
+   "lead": "\"load-bearing\""
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 6,
+   "id": "PC-llm-vocabulary",
+   "lead": "LLM vocabulary markers, replaced on sight along with their inflected f"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 7,
+   "id": "PC-praise-adjectives",
+   "lead": "praise adjectives with no measurement behind them: significant, innova"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 8,
+   "id": "PC-synonym-cycling",
+   "lead": "synonym cycling"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 9,
+   "id": "PC-copula-avoidance",
+   "lead": "copula avoidance and inflated formality"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 10,
+   "id": "PC-opposing-phrases",
+   "lead": "opposing phrases (\"It't not X, it's y\", \"It's more than X, it's Y\", \"I"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 11,
+   "id": "PC-phantom-foil",
+   "lead": "phantom-foil contrast"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 12,
+   "id": "PC-generic-openings",
+   "lead": "generic openings like \"In today's rapidly evolving landscape,\" [move 1"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 13,
+   "id": "PC-filler-transitions",
+   "lead": "filler transitions such as \"Moreover\" and \"Furthermore\" [move 1]"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 14,
+   "id": "PC-vague-claims",
+   "lead": "vague claims without evidence [move 2]"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 15,
+   "id": "PC-biography-claims",
+   "lead": "biography or credibility claims not backed by provided context [move 2"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 16,
+   "id": "PC-fake-first-person",
+   "lead": "fake first person"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 17,
+   "id": "PC-leading-subordinate",
+   "lead": "leading subordinate constructions before the main subject, meaning pre"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 18,
+   "id": "PC-abstract-nouns-as-actors",
+   "lead": "abstract nouns as actors"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 19,
+   "id": "PC-unanchored-definite",
+   "lead": "unanchored definite noun phrases"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 20,
+   "id": "PC-parallel-triads",
+   "lead": "parallel triads and isocolon comma-lists, meaning three or more clause"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 21,
+   "id": "PC-verbless-fragments",
+   "lead": "verbless fragments used as taglines, summaries, or closers (\"Two plugi"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 22,
+   "id": "PC-landing-beats",
+   "lead": "paragraph-final landing beats"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 23,
+   "id": "PC-gnomic-restatement",
+   "lead": "gnomic restatement"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 24,
+   "id": "PC-document-history",
+   "lead": "prose about how the document itself came to be (\"working name for what"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 25,
+   "id": "PC-label-colon-prefixes",
+   "lead": "label-colon prefixes in prose"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 26,
+   "id": "PC-labels-as-subject",
+   "lead": "labels promoted to subject"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 27,
+   "id": "PC-interrogative-signposts",
+   "lead": "interrogative signpost labels that segment prose into stages (\"What wa"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 28,
+   "id": "PC-evidential-status",
+   "lead": "evidential-status sentences that announce evidence instead of stating "
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 29,
+   "id": "PC-colons",
+   "lead": "colons, in every position"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 30,
+   "id": "PC-semicolons",
+   "lead": "semicolons, in every position"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 31,
+   "id": "PC-intensifiers",
+   "lead": "qualitative self-narration and intensifiers that carry no information "
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 32,
+   "id": "PC-cannot",
+   "lead": "the word \"cannot\" describing a failure"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 33,
+   "id": "PC-synthetic-negation",
+   "lead": "synthetic negation that hangs \"no\" on a noun instead of negating the v"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 34,
+   "id": "PC-displacing-negation",
+   "lead": "negation that displaces the subject"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 35,
+   "id": "PC-coordination",
+   "lead": "coordination hanging a second fact"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 36,
+   "id": "PC-agentless-passive",
+   "lead": "agentless passive with a demoted actor"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 37,
+   "id": "PC-trailing-anaphora",
+   "lead": "trailing anaphoric adjuncts that end a sentence with a backward pointe"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 38,
+   "id": "PC-trailing-supplements",
+   "lead": "trailing supplements that hang a second beat on a finished clause (\", "
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 39,
+   "id": "PC-anaphoric-postmodifiers",
+   "lead": "anaphoric postmodifiers buried in a noun phrase (\"the 2 to 8 hours per"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 40,
+   "id": "PC-cross-format-duplication",
+   "lead": "cross-format duplication"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 41,
+   "id": "PC-negative-space-padding",
+   "lead": "negative-space padding"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 42,
+   "id": "PC-pre-emptive-intent",
+   "lead": "pre-emptive intent relabelling"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 43,
+   "id": "PC-self-certifying",
+   "lead": "self-certifying claims"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 44,
+   "id": "PC-empty-data-structures",
+   "lead": "empty data structures"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 45,
+   "id": "PC-hedging-adjuncts",
+   "lead": "hedging adjuncts that qualify a claim without changing it (\"on its own"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 46,
+   "id": "PC-emotional-flatline",
+   "lead": "emotional flatline"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 47,
+   "id": "PC-lingering-attention",
+   "lead": "lingering-attention claims (\"the line I keep coming back to\", \"I can't"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 48,
+   "id": "PC-endorsement-closers",
+   "lead": "social endorsement closers (\"worth your time\", \"a must-read\", \"I highl"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 49,
+   "id": "PC-recap-flattery",
+   "lead": "recap-flattery openers that summarize the recipient's own work back at"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 50,
+   "id": "PC-narrated-candor",
+   "lead": "narrated candor"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 51,
+   "id": "PC-acknowledgment-loops",
+   "lead": "acknowledgment loops that restate the question or the prior context be"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 52,
+   "id": "PC-assistant-tool-leaks",
+   "lead": "assistant-tool leaks"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 53,
+   "id": "PC-round-trip-damage",
+   "lead": "round-trip damage"
+  },
+  {
+   "section": "Banned Patterns in All Writing",
+   "index": 54,
+   "id": "PC-speculative-gap-filling",
+   "lead": "speculative gap-filling"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 0,
+   "id": "PC-concise-and-direct",
+   "lead": "Be concise and direct"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 1,
+   "id": "PC-conversational-tone",
+   "lead": "Use a conversational tone while using professional language"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 2,
+   "id": "PC-minimum-facts",
+   "lead": "Say minimum facts only"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 3,
+   "id": "PC-no-duplicate-facts",
+   "lead": "NEVER state the same fact twice in different formats"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 4,
+   "id": "PC-you-and-we",
+   "lead": "Address the recipient as \"you\" and the sending team as \"we\""
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 5,
+   "id": "PC-warmth-that-acts",
+   "lead": "Warmth that changes what the reader does next is content under the min"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 6,
+   "id": "PC-preempt-wrong-assumption",
+   "lead": "Anticipate the reader's likely wrong assumption or wrong next step and"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 7,
+   "id": "PC-closing-condition",
+   "lead": "End correspondence with the concrete condition that should prompt a re"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 8,
+   "id": "PC-svo-default",
+   "lead": "Default every sentence to subject, verb, object"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 9,
+   "id": "PC-subject-census",
+   "lead": "The SVO default produces uniform sentence length"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 10,
+   "id": "PC-deletion-test",
+   "lead": "Run the deletion test on every sentence"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 11,
+   "id": "PC-balance-clause",
+   "lead": "A clause added for balance still has to be true"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 12,
+   "id": "PC-computed-number",
+   "lead": "A number you computed is a number you invented"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 13,
+   "id": "PC-modifier-earns-place",
+   "lead": "A modifier earns its place by changing a number, a date, an action, or"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 14,
+   "id": "PC-name-the-uncertainty",
+   "lead": "Qualify uncertainty by naming it, never by softening the claim"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 15,
+   "id": "PC-add-nothing",
+   "lead": "Never add a stance, a personality, or a fact the source did not carry"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 16,
+   "id": "PC-no-stock-human-phrasing",
+   "lead": "Never trade stock AI phrasing for stock human phrasing"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 17,
+   "id": "PC-cut-merge-reorder",
+   "lead": "Cut, merge, and reorder freely"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 18,
+   "id": "PC-leave-the-gap",
+   "lead": "Leave the gap when a sentence needs a fact the source lacks, and name "
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 19,
+   "id": "PC-gap-marker-floor",
+   "lead": "A gap marker costs the reader a sentence, so it has a floor"
+  },
+  {
+   "section": "Ghostwriting for Other Humans",
+   "index": 20,
+   "id": "PC-keep-the-assessment",
+   "lead": "A document whose deliverable is the writer's assessment keeps the asse"
+  }
+ ],
+ "case_name_to_id": {
+  "LLM vocabulary markers": "PC-llm-vocabulary",
+  "a number you computed is invented": "PC-computed-number",
+  "abstract nouns as actors": "PC-abstract-nouns-as-actors",
+  "acknowledgment loops": "PC-acknowledgment-loops",
+  "agentless passive with a demoted actor": "PC-agentless-passive",
+  "anaphoric postmodifiers": "PC-anaphoric-postmodifiers",
+  "assistant-tool leaks": "PC-assistant-tool-leaks",
+  "biography claims": "PC-biography-claims",
+  "colons": "PC-colons",
+  "coordination hanging a second fact": "PC-coordination",
+  "copula avoidance": "PC-copula-avoidance",
+  "cross-format duplication": "PC-cross-format-duplication",
+  "document history": "PC-document-history",
+  "emdashes": "PC-emdashes",
+  "emojis, glyphs, and ligatures as prose": "PC-emojis-and-glyphs",
+  "emotional flatline": "PC-emotional-flatline",
+  "empty data structures": "PC-empty-data-structures",
+  "evidential-status sentences": "PC-evidential-status",
+  "fake first person": "PC-fake-first-person",
+  "filler transitions": "PC-filler-transitions",
+  "generic openings": "PC-generic-openings",
+  "gnomic restatement": "PC-gnomic-restatement",
+  "hedging adjuncts": "PC-hedging-adjuncts",
+  "hype": "PC-hype",
+  "interrogative signpost labels": "PC-interrogative-signposts",
+  "label-colon prefixes in prose": "PC-label-colon-prefixes",
+  "labels promoted to subject": "PC-labels-as-subject",
+  "leading subordinate constructions": "PC-leading-subordinate",
+  "lingering-attention claims": "PC-lingering-attention",
+  "load-bearing": "PC-load-bearing",
+  "manufactured stakes": "PC-manufactured-stakes",
+  "marker substitution": "PC-marker-substitution",
+  "narrated candor": "PC-narrated-candor",
+  "negation that displaces the subject": "PC-displacing-negation",
+  "negative-space padding": "PC-negative-space-padding",
+  "opposing phrases": "PC-opposing-phrases",
+  "paragraph-final landing beats": "PC-landing-beats",
+  "parallel triads": "PC-parallel-triads",
+  "phantom-foil contrast": "PC-phantom-foil",
+  "praise adjectives": "PC-praise-adjectives",
+  "pre-emptive intent relabelling": "PC-pre-emptive-intent",
+  "recap-flattery openers": "PC-recap-flattery",
+  "round-trip damage": "PC-round-trip-damage",
+  "self-certifying claims": "PC-self-certifying",
+  "semicolons": "PC-semicolons",
+  "social endorsement closers": "PC-endorsement-closers",
+  "speculative gap-filling": "PC-speculative-gap-filling",
+  "subject census": "PC-subject-census",
+  "synonym cycling": "PC-synonym-cycling",
+  "synthetic negation": "PC-synthetic-negation",
+  "the word cannot describing a failure": "PC-cannot",
+  "trailing anaphoric adjuncts": "PC-trailing-anaphora",
+  "trailing supplements": "PC-trailing-supplements",
+  "unanchored definite noun phrases": "PC-unanchored-definite",
+  "verbless fragments": "PC-verbless-fragments",
+  "warmth that changes what the reader does": "PC-warmth-that-acts"
+ }
+}

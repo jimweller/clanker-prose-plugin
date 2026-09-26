@@ -1,0 +1,163 @@
+__description,polarity,bullet,input,__expected1,__expected2
+computed-01,rewrite,PC-computed-number,"The archive held 24 of the 64 weeks, which is more than a third.",not-contains:more than a third,icontains:24
+computed-02,rewrite,PC-computed-number,"The cap is 25 MiB and the largest processed file was 24.98 MiB, so we are under the limit by 0.02 MiB.",not-contains:0.02,icontains:24.98
+computed-03,rewrite,PC-computed-number,"Four of the thirty-three teams adopted it, roughly one in eight.",not-contains:one in eight,icontains:thirty-three
+computed-04,rewrite,PC-computed-number,"The scan found 14 hotspots across 5 repositories, averaging about 3 per repo.",not-contains:3 per repo,icontains:14
+computed-05,rewrite,PC-computed-number,"p95 fell from 29.0s to 6.81s, a 77 percent improvement.",not-contains:77 percent,icontains:6.81
+computed-06,rewrite,PC-computed-number,"No upload has been turned away, and none has had room to spare either.",not-contains:room to spare,icontains:turned away
+computed-07,preserve,PC-computed-number,The archive held 24 of the 64 weeks.,icontains:24 of the 64,
+computed-08,preserve,PC-computed-number,The cap is 25 MiB. The largest file processed so far measured 24.98 MiB.,icontains:24.98,
+computed-09,preserve,PC-computed-number,"1,000 log lines returned against a query cap of 1,000.","icontains:1,000",
+tool-leak-01,rewrite,PC-assistant-tool-leaks,The runbook is at https://example.com/ops?utm_source=chatgpt.com and covers failover.,not-contains:utm_source,icontains:failover
+tool-leak-02,rewrite,PC-assistant-tool-leaks,See the vendor advisory citeturn0search0 for the affected versions.,not-contains:citeturn,icontains:advisory
+tool-leak-03,rewrite,PC-assistant-tool-leaks,"Signed, [Your Name], Platform Engineering.",not-contains:[Your Name],icontains:Platform Engineering
+tool-leak-04,rewrite,PC-assistant-tool-leaks,The incident began on 2025-XX-XX and lasted four hours.,not-contains:2025-XX-XX,icontains:four hours
+tool-leak-05,rewrite,PC-assistant-tool-leaks,Full details in contentReference[oaicite:0] and the attached log.,not-contains:oaicite,icontains:log
+tool-leak-06,rewrite,PC-assistant-tool-leaks,Reference the migration guide at https://docs.example.com/migrate?utm_source=claude.ai for the steps.,not-contains:utm_source,icontains:migration guide
+tool-leak-07,preserve,PC-assistant-tool-leaks,The runbook is at https://example.com/ops and covers failover.,icontains:example.com/ops,
+tool-leak-08,preserve,PC-assistant-tool-leaks,Customer voice: not available in the research retrieved. [NEEDS INPUT before review],icontains:NEEDS INPUT,
+tool-leak-09,preserve,PC-assistant-tool-leaks,The incident began at 02:04 on 8/14 and lasted four hours.,icontains:8/14,
+copula-01,rewrite,PC-copula-avoidance,The runbook serves as the reference for on-call staff.,not-contains:serves as,icontains:runbook
+copula-02,rewrite,PC-copula-avoidance,This release represents a change to the default retry count.,not-contains:represents,icontains:retry
+copula-03,rewrite,PC-copula-avoidance,The dashboard features six panels and a rolling alert list.,not-contains:features,icontains:six panels
+copula-04,rewrite,PC-copula-avoidance,The cluster boasts 40 nodes across three zones.,not-contains:boasts,icontains:40 nodes
+copula-05,rewrite,PC-copula-avoidance,We utilize a shared cache in order to reduce Datahub traffic.,not-contains:utilize,not-contains:in order to
+copula-06,rewrite,PC-copula-avoidance,The migration was deferred due to the fact that the index had not landed.,not-contains:due to the fact,icontains:index
+copula-07,preserve,PC-copula-avoidance,The runbook is the reference for on-call staff.,icontains:runbook,
+copula-08,preserve,PC-copula-avoidance,The dashboard has six panels and a rolling alert list.,icontains:six panels,
+copula-09,preserve,PC-copula-avoidance,The sweeper reclaims blobs older than seven days.,icontains:seven days,
+glyph-01,rewrite,PC-emojis-and-glyphs,🚀 The build passed on all three platforms. Ship it!,icontains:three platforms,
+glyph-02,rewrite,PC-emojis-and-glyphs,📊 Status update on the rollout: four teams done ✅ and two pending ⏳,icontains:four teams,
+glyph-03,rewrite,PC-emojis-and-glyphs,"🎉 The p95 dropped to 400 ms, a solid win for the caching work.",not-contains:solid win,icontains:400 ms
+glyph-04,rewrite,PC-emojis-and-glyphs,"⚠️ Heads up team, the freeze starts Thursday and lasts through the release.",icontains:Thursday,
+glyph-05,rewrite,PC-emojis-and-glyphs,✅ The migration is complete and the old tables are dropped 🗑,icontains:old tables,
+glyph-06,rewrite,PC-emojis-and-glyphs,🔔 Reminder: the on-call rotation changes at six.,icontains:six,
+glyph-07,preserve,PC-emojis-and-glyphs,The banner renders a green circle when the check passes and a red square when it fails.,icontains:green circle,icontains:red square
+glyph-08,preserve,PC-emojis-and-glyphs,"The status column uses a filled dot for enforcing and a hollow dot for reporting, defined in the legend above.",icontains:filled dot,
+glyph-09,preserve,PC-emojis-and-glyphs,"The count is 4,041 across every retained digest.","icontains:4,041",
+hype-01,rewrite,PC-hype,The new pipeline is production ready and battle tested.,not-contains:production ready,not-contains:battle tested
+hype-02,rewrite,PC-hype,This is a next-generation approach to dependency scanning.,not-contains:next-generation,icontains:dependency scanning
+hype-03,rewrite,PC-hype,The framework gives us a powerful and comprehensive view of the estate.,not-contains:powerful,not-contains:comprehensive
+hype-04,rewrite,PC-hype,A game-changer for how the team handles incident review.,not-contains:game-changer,icontains:incident review
+hype-05,rewrite,PC-hype,Our cutting-edge observability stack surfaces issues before users see them.,not-contains:cutting-edge,icontains:observability
+hype-06,rewrite,PC-hype,This revolutionary change to the scheduler eliminates queueing entirely.,not-contains:revolutionary,icontains:scheduler
+hype-07,preserve,PC-hype,The pipeline runs in CI on every pull request and has blocked 31 merges since June.,icontains:31 merges,
+hype-08,preserve,PC-hype,The scanner covers 8 of the 13 repositories. The other 5 have no pipeline step.,icontains:8 of the 13,
+hype-09,preserve,PC-hype,The scheduler holds a job for at most three retries before dropping it.,icontains:three retries,
+signpost-01,rewrite,PC-interrogative-signposts,What changed. The scheduler now retries three times.,not-contains:What changed,icontains:three
+signpost-02,rewrite,PC-interrogative-signposts,Why it matters. A dropped job leaves no record.,not-contains:Why it matters,icontains:record
+signpost-03,rewrite,PC-interrogative-signposts,Where it stands. Two of nine tables have cut over.,not-contains:Where it stands,icontains:nine
+signpost-04,rewrite,PC-interrogative-signposts,What you need to do. Rotate the key before Friday.,not-contains:What you need to do,icontains:Friday
+signpost-05,rewrite,PC-interrogative-signposts,The problem. The gate authenticates nobody.,not-contains:The problem,icontains:gate
+signpost-06,rewrite,PC-interrogative-signposts,The fix. Pass the filter server-side.,not-contains:The fix,icontains:filter
+signpost-07,preserve,PC-interrogative-signposts,"The scheduler retries three times and then drops the job, leaving no record for the next poll.",icontains:three times,
+signpost-08,preserve,PC-interrogative-signposts,Rotate the key before Friday. The stage secret expires on the fourteenth.,icontains:fourteenth,
+signpost-09,preserve,PC-interrogative-signposts,Two of nine tables have cut over. The other seven are blocked on the index.,icontains:seven,
+labelcolon-01,rewrite,PC-label-colon-prefixes,Bottom line: the WAF blocks nothing today.,not-contains:Bottom line,icontains:WAF
+labelcolon-02,rewrite,PC-label-colon-prefixes,Net effect: three services authenticate no caller.,not-contains:Net effect,icontains:three services
+labelcolon-03,rewrite,PC-label-colon-prefixes,Status: the index finished building at 03:10.,not-contains:Status:,icontains:03:10
+labelcolon-04,rewrite,PC-label-colon-prefixes,To be clear: the restore has never been tested.,not-contains:To be clear,icontains:restore
+labelcolon-05,rewrite,PC-label-colon-prefixes,Honest status: the migration is three weeks behind.,not-contains:Honest status,icontains:three weeks
+labelcolon-06,rewrite,PC-label-colon-prefixes,Key takeaway: nobody owns the audit-log gap.,not-contains:Key takeaway,icontains:audit-log
+labelcolon-07,preserve,PC-label-colon-prefixes,The WAF blocks nothing today because it runs in Detection mode.,icontains:Detection,
+labelcolon-08,preserve,PC-label-colon-prefixes,"Recorded TLS minimums, attachment 1.2 and orchestrator 1.3.",icontains:1.3,
+labelcolon-09,preserve,PC-label-colon-prefixes,The migration is three weeks behind. The index rebuild took longer than the estimate.,icontains:index rebuild,
+leadsub-01,rewrite,PC-leading-subordinate,"To avoid a partial write, the installer checks permissions first.",not-contains:To avoid,icontains:permissions
+leadsub-02,rewrite,PC-leading-subordinate,"When the probe times out, the orchestrator marks the pod unhealthy.",not-contains:When the probe,icontains:unhealthy
+leadsub-03,rewrite,PC-leading-subordinate,"Because the cache is shared, a flag flip is invisible for an hour.",not-contains:Because the cache,icontains:hour
+leadsub-04,rewrite,PC-leading-subordinate,Whether the gate is enabled in staging turns on one app setting.,not-contains:Whether the gate,icontains:app setting
+leadsub-05,rewrite,PC-leading-subordinate,What determines the routing target is the Salesforce flag.,not-contains:What determines,icontains:Salesforce
+leadsub-06,rewrite,PC-leading-subordinate,Breaking a large batch into smaller ones is still a batch.,not-contains:Breaking a large,icontains:batch
+leadsub-07,preserve,PC-leading-subordinate,"If the roles are missing, run the bootstrap and restart the App Service.",icontains:bootstrap,
+leadsub-08,preserve,PC-leading-subordinate,"If a queue drains after conversion, the boundary was never the problem.",icontains:boundary,
+leadsub-09,preserve,PC-leading-subordinate,The installer checks permissions before it writes anything.,icontains:permissions,
+loadbear-01,rewrite,PC-load-bearing,The review is load-bearing for the release.,not-contains:load-bearing,icontains:release
+loadbear-02,rewrite,PC-load-bearing,That clause is load bearing in the whole argument.,not-contains:load bearing,icontains:clause
+loadbear-03,rewrite,PC-load-bearing,Choosing Stage over Test is the load-bearing decision here.,not-contains:load-bearing,icontains:Stage
+loadbear-04,rewrite,PC-load-bearing,"The private endpoint is load-bearing, so removing it breaks every caller.",not-contains:load-bearing,icontains:private endpoint
+loadbear-05,rewrite,PC-load-bearing,This assumption is load bearing and nobody has checked it.,not-contains:load bearing,icontains:assumption
+loadbear-06,rewrite,PC-load-bearing,The index is the load-bearing part of the row cap.,not-contains:load-bearing,icontains:row cap
+loadbear-07,preserve,PC-load-bearing,The review gates the release. Nothing merges until it passes.,icontains:gates the release,
+loadbear-08,preserve,PC-load-bearing,Deleting the private endpoint breaks every caller inside the VNet.,icontains:VNet,
+loadbear-09,preserve,PC-load-bearing,"The index has to land before the row cap, because the cap scans the same key order.",icontains:key order,
+markersub-01,rewrite,PC-marker-substitution,"DEVX-3716 is open, because everything built so far was tooling or a fixture.",not-contains:because,icontains:DEVX-3716
+markersub-02,rewrite,PC-marker-substitution,"The build is red, so the cache was pruned on Monday.",not-contains:so the cache,icontains:Monday
+markersub-03,rewrite,PC-marker-substitution,"Adoption sits at 12 percent, therefore the runbook has four owners.",not-contains:therefore,icontains:12 percent
+markersub-04,rewrite,PC-marker-substitution,"The scan found 14 hotspots, which means the gate fails.",not-contains:which means,icontains:14
+markersub-05,rewrite,PC-marker-substitution,"Adoption reached 12 percent in August. The runbook has four owners, because adoption reached 12 percent.",not-contains:because adoption,icontains:four owners
+markersub-06,rewrite,PC-marker-substitution,"Three teams adopted the linter, so the CVE count fell.",not-contains:so the CVE,icontains:Three teams
+markersub-07,preserve,PC-marker-substitution,"The installer writes the config before it checks permissions, so a failed check leaves a half-written file.",icontains:half-written,
+markersub-08,preserve,PC-marker-substitution,"The gate is in Detection mode, so it logs every match and blocks none.",icontains:Detection,
+markersub-09,preserve,PC-marker-substitution,"The index has not landed, so the row cap cannot ship yet.",icontains:row cap,
+negspace-01,rewrite,PC-negative-space-padding,"Out of scope, a rewrite of the ORM layer, a change to the connection pool, a switch to a managed service, and a new backup policy. The cutover is on the ninth.",not-contains:Out of scope,icontains:ninth
+negspace-02,rewrite,PC-negative-space-padding,"Non-goals for this release, a new admin UI, a second storage backend, multi-region failover, and a public API.",not-contains:Non-goals,icontains:release
+negspace-03,rewrite,PC-negative-space-padding,"Deliberately not covered, the Windows agent, the legacy SOAP endpoint, the archived tenants, and the internal demo sites.",not-contains:Deliberately not covered,
+negspace-04,rewrite,PC-negative-space-padding,"We did not change the retry count, the backoff curve, the jitter, or the dead-letter policy.",icontains:retry count,
+negspace-05,rewrite,PC-negative-space-padding,"This spike does not address pricing, packaging, licensing, or the partner agreement.",icontains:spike,
+negspace-06,rewrite,PC-negative-space-padding,"Not in this PR, tests for the sweeper, docs for the flag, a migration, or a changelog entry.",not-contains:Not in this PR,icontains:PR
+negspace-07,preserve,PC-negative-space-padding,"The bootstrap creates roles, the schema and the grants. It does not create the databases, because those are provisioned by Terraform.",icontains:Terraform,
+negspace-08,preserve,PC-negative-space-padding,The scan covers application source only. Container images are counted separately and the two numbers never merge.,icontains:Container images,
+negspace-09,preserve,PC-negative-space-padding,Standard DTR is out of scope because Product asked for adaptive only on 8/19.,icontains:8/19,
+opposing-01,rewrite,PC-opposing-phrases,"It is not a linter, it is a contract.",not-contains:not a linter,
+opposing-02,rewrite,PC-opposing-phrases,"This is more than a runbook, it is an operating model.",not-contains:more than a runbook,icontains:operating model
+opposing-03,rewrite,PC-opposing-phrases,"It is not just a cache, it is the source of truth for routing.",not-contains:not just a cache,icontains:routing
+opposing-04,rewrite,PC-opposing-phrases,The finding is not a bug but four independent implementations of the same idea.,not-contains:not a bug but,icontains:four
+opposing-05,rewrite,PC-opposing-phrases,"This is not gaming detection, it is real-time discrepancy flagging.",not-contains:not gaming detection,icontains:discrepanc
+opposing-06,rewrite,PC-opposing-phrases,"Not only does the gate authenticate nobody, it also logs nothing.",not-contains:Not only,icontains:log
+opposing-07,preserve,PC-opposing-phrases,"The tool authenticates the string, not the person holding it.",icontains:string,
+opposing-08,preserve,PC-opposing-phrases,Severity is the technical rating. Priority is what the team agreed to work it at.,icontains:Priority,
+opposing-09,preserve,PC-opposing-phrases,These are observations from the inventory. None has been tested against a running system.,icontains:inventory,
+landing-01,rewrite,PC-landing-beats,"Four of the thirty-three teams adopted the runbook this year. DevX owns it and reviews it each quarter, and the review takes about two hours. The other teams were never asked. That is the department standard.",not-contains:That is the department standard,icontains:thirty-three
+landing-02,rewrite,PC-landing-beats,"The sweeper runs every fifteen minutes and reclaims blobs older than seven days. It skips anything with an active lease, which is how in-flight uploads survive a sweep. No flag sets it.",not-contains:No flag sets it,icontains:fifteen
+landing-03,rewrite,PC-landing-beats,"We measured the gate on all thirteen repositories and found eight with a pipeline step. Five have none, and three of those five carry the highest CVE counts in the estate. Five is the number that matters.",not-contains:Five is the number,icontains:thirteen
+landing-04,rewrite,PC-landing-beats,The index landed on the ninth and the row cap shipped a week later. Query time on the worst tenant fell from sixteen seconds to under one. Nobody noticed.,not-contains:Nobody noticed,icontains:sixteen
+landing-05,rewrite,PC-landing-beats,"Two reviewers reached opposite conclusions on the support date and the document asserts neither. Settling it takes one lookup against the vendor policy page, and it changes the urgency for six services. One lookup.",not-contains:One lookup.,icontains:six services
+landing-06,preserve,PC-landing-beats,The runner is a thirty-line binary that execs the sync script and exists only to own a TCC identity. Rebuilding it voids both domain grants and macOS prompts again on the next run. Do not re-sign it.,icontains:re-sign,icontains:TCC
+landing-07,preserve,PC-landing-beats,"The scan covered 193 pages and flagged 69 at three or more em-dashes. Those 69 hold 7,946 sentences and 3,337 of them carry a deterministic hit. That is 42 percent.","icontains:3,337","icontains:7,946"
+landing-08,preserve,PC-landing-beats,"Both grants are keyed to the binary path and its code hash. A rebuild voids them and the next run prompts again, which only works with a user logged in. Never re-sign it.",icontains:re-sign,icontains:code hash
+landing-09,preserve,PC-landing-beats,"The bootstrap creates the roles and the grants on all four tiers using identical commands. Only the input values differ, and this page records them per tier alongside the expected query output.",icontains:four tiers,
+census-01,rewrite,PC-subject-census,"The scheduler drops a job after three retries. It writes no record when it does. They then reappear in the next poll, and it never reconciles them.",icontains:three retries,icontains:poll
+census-02,rewrite,PC-subject-census,The sweeper reclaims stale blobs each quarter-hour. This is why the storage bill fell. That also explains the drop in restore requests. It has held since June.,icontains:June,
+census-03,rewrite,PC-subject-census,Chasing the leak took four days. Reading the dumps took two more. Filing the tickets took an afternoon. Closing them is still outstanding.,icontains:four days,
+census-04,rewrite,PC-subject-census,The gateway fronts both listeners. It carries the policy. It routes by path. It terminates TLS at 1.2.,icontains:1.2,
+census-05,rewrite,PC-subject-census,The report was generated on Monday. It was reviewed on Tuesday. It was filed on Wednesday. Nothing was acted on.,icontains:Monday,
+census-06,rewrite,PC-subject-census,Migration of the schema is underway. Conversion of the indexes follows. Validation of the row counts is last. All three are behind.,icontains:row counts,
+census-07,preserve,PC-subject-census,"The scheduler drops a job after three retries and writes no record. The next poll cannot tell a dropped job from a new one, so the queue depth climbs overnight.",icontains:queue depth,
+census-08,preserve,PC-subject-census,Alex read the memory dumps on the eleventh. Kevin filed IS-1227 the same afternoon. The Synapse team picked it up on the fourteenth.,icontains:IS-1227,
+census-09,preserve,PC-subject-census,"The gateway terminates TLS at 1.2 and routes by path. Its WAF policy runs in Detection mode, so nothing it matches is blocked.",icontains:Detection,
+synonym-01,rewrite,PC-synonym-cycling,"The platform now carries eleven services. The ecosystem grew by four this quarter, and the stack absorbed the rest from the retired cluster. Nobody has audited the environment since March.",icontains:eleven,icontains:March
+synonym-02,rewrite,PC-synonym-cycling,"The pipeline runs on every push. The workflow also fires on tags, and the automation covers nightly builds. The job has not been touched since June.",icontains:June,
+synonym-03,rewrite,PC-synonym-cycling,"The runbook lists nine steps. The guide covers rotation, and the document also describes rollback. Four of the playbook's steps are stale.",icontains:nine steps,
+synonym-04,rewrite,PC-synonym-cycling,The agent writes the manifest. The assistant validates it. The bot then applies it. The tool logs each phase.,icontains:manifest,
+synonym-05,rewrite,PC-synonym-cycling,"The datastore holds six tables. The repository indexes three of them, and the warehouse mirrors the rest. Two of the database's tables have no owner.",icontains:six tables,
+synonym-06,rewrite,PC-synonym-cycling,"The cutover moves four tables. The migration runs Friday, and the transition completes Sunday. The switchover has no rollback.",icontains:four tables,
+synonym-07,preserve,PC-synonym-cycling,"The platform carries eleven services. The platform has not been audited since March, and four of the eleven have no named owner.",icontains:eleven,
+synonym-08,preserve,PC-synonym-cycling,Keycloak groups its clients into realms. Each realm carries its own token lifetime.,icontains:realms,
+synonym-09,preserve,PC-synonym-cycling,The sweeper reclaims blobs. The scanner reads digests. The two run on different schedules and share no state.,icontains:digests,
+synneg-01,rewrite,PC-synthetic-negation,DevX was invited to no planning meeting.,not-contains:no planning meeting,icontains:DevX
+synneg-02,rewrite,PC-synthetic-negation,The batch ran on no worker in the pool.,not-contains:no worker,icontains:batch
+synneg-03,rewrite,PC-synthetic-negation,We heard back from no reviewer before the deadline.,not-contains:no reviewer,icontains:deadline
+synneg-04,rewrite,PC-synthetic-negation,Not one ticket is blocked at the plausibility gate.,not-contains:Not one ticket,icontains:gate
+synneg-05,rewrite,PC-synthetic-negation,The finding appears in no tracker we searched.,not-contains:in no tracker,icontains:tracker
+synneg-06,rewrite,PC-synthetic-negation,The change shipped with no test and to no staging tier.,not-contains:to no staging,icontains:test
+synneg-07,preserve,PC-synthetic-negation,"The rebuild makes no difference to the grant, because the hash is unchanged.",icontains:hash,
+synneg-08,preserve,PC-synthetic-negation,The revert had no effect on the dropped column.,icontains:dropped column,
+synneg-09,preserve,PC-synthetic-negation,Changing the TTL makes no sense while the blob stamp already fixes the target.,icontains:blob stamp,
+fragment-01,rewrite,PC-verbless-fragments,"Two plugins, one lab.","not-contains:Two plugins, one lab",
+fragment-02,rewrite,PC-verbless-fragments,"One config, every machine.","not-contains:One config, every machine",
+fragment-03,rewrite,PC-verbless-fragments,"Same engine, new surface.","not-contains:Same engine, new surface",
+fragment-04,rewrite,PC-verbless-fragments,"Nominal coverage only, and dangerous as written.",not-contains:Nominal coverage only,
+fragment-05,rewrite,PC-verbless-fragments,"Time-boxed, not a priority question.","not-contains:Time-boxed, not",
+fragment-06,rewrite,PC-verbless-fragments,"Internal audience, public endpoint.","not-contains:Internal audience, public endpoint",
+fragment-07,preserve,PC-verbless-fragments,"Two plugins share one lab, and the lab is rebuilt nightly.",icontains:nightly,
+fragment-08,preserve,PC-verbless-fragments,"The tool is internal-only by audience, and its dev host is reachable from the internet.",icontains:internet,
+fragment-09,preserve,PC-verbless-fragments,The coverage is nominal. Both tickets ask for a policy to be created and neither names a mode.,icontains:mode,
+warmth-01,rewrite,PC-warmth-that-acts,We really hope this helps and we are always here if you need anything at all. The index finished at 03:10.,not-contains:always here,icontains:03:10
+warmth-02,rewrite,PC-warmth-that-acts,"Thanks again for your patience and understanding throughout this process, it means a lot to the team. The cutover is Friday.",not-contains:means a lot,icontains:Friday
+warmth-03,rewrite,PC-warmth-that-acts,Wishing you a great rest of your week. The stage secret expires on the fourteenth.,not-contains:great rest of your week,icontains:fourteenth
+warmth-04,rewrite,PC-warmth-that-acts,"No pressure at all on this one, whenever you get a chance is completely fine. The freeze starts Thursday.",not-contains:No pressure at all,icontains:Thursday
+warmth-05,rewrite,PC-warmth-that-acts,Hope you are doing well. The restore has never been tested on any service.,not-contains:Hope you are doing well,icontains:restore
+warmth-06,rewrite,PC-warmth-that-acts,"Feel free to reach out with any questions whatsoever, big or small. The rotation runs at six.",not-contains:big or small,icontains:six
+warmth-07,preserve,PC-warmth-that-acts,"We are holding the release until you confirm the index finished. Ping us either way, because the rotation changes at six and the next person has no context.",icontains:six,
+warmth-08,preserve,PC-warmth-that-acts,"Take the time you need on the review. The freeze does not start until Thursday, so there is room.",icontains:Thursday,
+warmth-09,preserve,PC-warmth-that-acts,"This is your call, not ours. We will implement whichever target you pick and the config diff is two lines either way.",icontains:two lines,

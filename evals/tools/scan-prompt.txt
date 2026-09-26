@@ -1,0 +1,25 @@
+You are selecting eval cases from one chunk of a document.
+
+The `<prose-contract>` block is already in your global instructions. Each rule there opens with a `PC-` id. Do not restate the rules.\n\nJudge only these rules on this pass. Ignore every other rule, including em-dashes, semicolons, and colons.
+
+__BULLETS__
+
+Read the chunk and emit candidates of two kinds.
+
+A rewrite candidate is a span that violates one of the listed rules, where a careful editor would agree the defect is real.\n\nA preserve candidate is a span that looks like a violation of one of the listed rules and that the rule's own exemption protects. These are the valuable ones. Look for them deliberately, because a suite built only from defects teaches an editor to delete everything.
+
+Rules.
+
+Quote the span verbatim with its original punctuation. Never paraphrase, never repair, never truncate mid-sentence.
+A sentence span is exactly one sentence. Use a paragraph span only when the defect cannot be seen without the surrounding sentences.
+Skip a span unless two careful editors would reach the same verdict on it. Ambiguity in the case becomes noise in the results.
+Emit at most 6 candidates. Fewer is correct. An empty array is correct for a clean chunk.
+Judge the prose. Ignore headings, table cells, code, link text, and quoted speech.
+
+Output JSON only. No preamble, no commentary, no code fence.
+
+[{"bullet":"PC-id copied exactly from the list","polarity":"rewrite","granularity":"sentence","span":"verbatim text","reason":"one line naming what the span does","confidence":"high"}]
+
+<<<CHUNK>>>
+__TEXT__
+<<<END>>>

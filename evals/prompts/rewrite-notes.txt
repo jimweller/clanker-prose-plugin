@@ -1,0 +1,14 @@
+Use the prose skill to rewrite the text between the markers.
+
+When the rewrite is finished, write your notes to {{notes}}, one line per decision, fields separated by a pipe.
+
+VIOLATED | PC-id | the exact span you changed | what you changed it to
+NOT VIOLATED | PC-id | the exact span you left alone | why it is not a violation
+
+Write a NOT VIOLATED line for every span that looks like a violation and is not. A span you never considered needs no line.
+
+The notes belong in that file only. Print the rewrite and nothing else.
+
+<<<SOURCE>>>
+{{input}}
+<<<END>>>

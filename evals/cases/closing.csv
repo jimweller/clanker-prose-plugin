@@ -1,0 +1,71 @@
+__description,polarity,bullet,input,__expected1,__expected2
+emdash-08,rewrite,PC-emdashes,The scheduler drops the job after three retries — nobody is paged.,icontains:three retries,
+emdash-09,rewrite,PC-emdashes,"We pinned the base image — the CVE count fell from 4,041 to 118.",icontains:118,
+emdash-10,rewrite,PC-emdashes,"The runner owns the grant — launchd invokes the shell instead, so every read fails.",icontains:launchd,
+emdash-11,rewrite,PC-emdashes,Rotation is due Friday -- the stage secret expires on the fourteenth.,icontains:fourteenth,
+emdash-12,rewrite,PC-emdashes,The gate authenticates the caller — it does not authorize the request.,icontains:authorize,
+emdash-13,preserve,PC-emdashes,"The pipeline runs four stages — fetch, build, scan, publish — and stops at the first failure.",icontains:publish,icontains:fetch
+emdash-14,preserve,PC-emdashes,The window was 03:10 to 04:25 UTC — after the last of the eight events.,icontains:03:10,
+colon-04,rewrite,PC-colons,The finding is simple: the WAF logs and blocks nothing.,icontains:WAF,
+colon-05,rewrite,PC-colons,"Three profiles exist: jim, work, and hearst.",icontains:hearst,
+colon-06,rewrite,PC-colons,Two grants are needed: one for the Drive domain and one for OneDrive.,icontains:OneDrive,
+colon-07,rewrite,PC-colons,The sweeper has one job: reclaim blobs older than seven days.,icontains:seven days,
+colon-08,rewrite,PC-colons,Remember the constraint: the signal cannot come from a list we maintain.,icontains:signal,
+colon-09,preserve,PC-colons,Set `sops.age.recipient: age1abc` in the manifest before running the installer.,icontains:recipient,
+colon-10,preserve,PC-colons,The job starts at 03:30 and the ratio of hits to misses runs 3:1.,icontains:03:30,
+semicolon-03,rewrite,PC-semicolons,The index landed Tuesday; the row cap shipped a week later.,icontains:Tuesday,
+semicolon-04,rewrite,PC-semicolons,Backups exist; nobody has restored one.,icontains:Backups,
+semicolon-05,rewrite,PC-semicolons,The gate is enabled in prod; staging was never read.,icontains:staging,
+semicolon-06,rewrite,PC-semicolons,Severity is the technical rating; priority is what the team agreed to work it at.,icontains:priority,
+semicolon-07,rewrite,PC-semicolons,"The agents are backup, nightly; logrotate, at 03:30; and steampipe, at login.",icontains:logrotate,
+semicolon-08,rewrite,PC-semicolons,Pooling makes the allocation cheaper; it does not stop the fetch.,icontains:fetch,
+semicolon-09,preserve,PC-semicolons,Run `set -euo pipefail; exec claude` from the wrapper script.,icontains:pipefail,
+semicolon-10,preserve,PC-semicolons,The CSS rule is `display: none; visibility: hidden` on the placeholder.,icontains:visibility,
+triad-03,rewrite,PC-parallel-triads,"The config lands in Git, the secret travels with SOPS, and the log is readable by anyone.",icontains:SOPS,
+triad-04,rewrite,PC-parallel-triads,"The change is small, the risk is low, and the payoff is large.",icontains:change,
+triad-05,rewrite,PC-parallel-triads,"We measured the gate, we read the source, and we reconciled the two.",icontains:gate,
+triad-06,rewrite,PC-parallel-triads,"It is faster to write, easier to review, and cheaper to run.",icontains:review,
+triad-07,rewrite,PC-parallel-triads,"The scanner finds it, the linter flags it, and the hook blocks it.",icontains:hook,
+triad-08,rewrite,PC-parallel-triads,"Adoption grew, latency fell, and the team shrank.",icontains:latency,
+triad-09,preserve,PC-parallel-triads,"The installer fetches the manifest, links the configs, and loads the agents.",icontains:manifest,icontains:agents
+triad-10,preserve,PC-parallel-triads,"The pipeline lints, builds, and publishes, in that order.",icontains:publishes,
+praise-03,rewrite,PC-praise-adjectives,This is a significant improvement to the build time.,not-contains:significant,icontains:build time
+praise-04,rewrite,PC-praise-adjectives,The team took an innovative approach to the caching problem.,not-contains:innovative,icontains:caching
+praise-05,rewrite,PC-praise-adjectives,A scalable and effective solution to the routing question.,not-contains:scalable,icontains:routing
+praise-06,rewrite,PC-praise-adjectives,The dashboard is exceptional and the alerting is best-in-class.,not-contains:exceptional,not-contains:best-in-class
+praise-07,rewrite,PC-praise-adjectives,Their state-of-the-art indexing makes this a compelling option.,not-contains:state-of-the-art,icontains:indexing
+praise-08,rewrite,PC-praise-adjectives,The remediation plan is sophisticated and unprecedented for this team.,not-contains:unprecedented,icontains:remediation
+praise-09,preserve,PC-praise-adjectives,"Tara pushed back substantively on the ownership split, and the concern is well-articulated.",icontains:well-articulated,
+praise-10,preserve,PC-praise-adjectives,The build time fell from 11 minutes to 4.,icontains:11 minutes,
+llmvocab-03,rewrite,PC-llm-vocabulary,We should delve into the retry semantics before committing.,not-contains:delve,icontains:retry
+llmvocab-04,rewrite,PC-llm-vocabulary,The migration is a testament to the meticulous planning of the team.,not-contains:testament to,not-contains:meticulous
+llmvocab-05,rewrite,PC-llm-vocabulary,We leverage the shared cache for a seamless developer experience.,not-contains:leverage,not-contains:seamless
+llmvocab-06,rewrite,PC-llm-vocabulary,The retro produced actionable learnings we can apply next sprint.,not-contains:actionable,not-contains:learnings
+llmvocab-07,rewrite,PC-llm-vocabulary,"A holistic view of the estate, with impactful synergy across teams.",not-contains:holistic,not-contains:synergy
+llmvocab-08,rewrite,PC-llm-vocabulary,The architecture is a rich tapestry of robust services.,not-contains:tapestry,not-contains:robust
+llmvocab-09,preserve,PC-llm-vocabulary,"Keycloak groups its clients into realms, and each realm carries its own token lifetime.",icontains:realms,
+llmvocab-10,preserve,PC-llm-vocabulary,Entra dynamic groups evaluate membership rules on every directory write.,icontains:dynamic groups,
+crossfmt-03,rewrite,PC-cross-format-duplication,"The table above lists the three profiles and their helpers. The jim profile uses a GitHub token helper, the work profile uses an Azure DevOps helper, and the hearst profile uses a GitHub token helper.",icontains:profile,
+crossfmt-04,rewrite,PC-cross-format-duplication,"The chart shows monthly spend. January was 4,100 dollars, February was 3,800, March was 4,400, and April was 5,100.",icontains:chart,
+crossfmt-05,rewrite,PC-cross-format-duplication,"Per the list above, the four steps are fetch, build, scan, and publish. Fetch comes first, then build, then scan, then publish.",icontains:publish,
+crossfmt-06,rewrite,PC-cross-format-duplication,"See the config block below. It sets force to true, create to true, and relink to true.",icontains:config block,
+crossfmt-07,rewrite,PC-cross-format-duplication,"The matrix records nine rows. Six are green, two are red, and one is grey.",icontains:matrix,
+crossfmt-08,rewrite,PC-cross-format-duplication,"As the code sample shows, the function takes a prompt as its first argument and returns the reply on stdout.",icontains:stdout,
+crossfmt-09,preserve,PC-cross-format-duplication,The table above records which account called which model. Two of the five entries predate the Bedrock migration.,icontains:Bedrock,
+crossfmt-10,preserve,PC-cross-format-duplication,"Of the nine rows in the matrix, only the grey one is unmeasured, and that is the subscription we cannot read.",icontains:grey,
+labelsubj-03,rewrite,PC-labels-as-subject,The biggest risk is confusing the fixture accounts with production accounts.,not-contains:biggest risk,icontains:fixture
+labelsubj-04,rewrite,PC-labels-as-subject,The main takeaway is that nobody owns the audit-log gap.,not-contains:main takeaway,icontains:audit-log
+labelsubj-05,rewrite,PC-labels-as-subject,The key concern is that the WAF blocks nothing.,not-contains:key concern,icontains:WAF
+labelsubj-06,rewrite,PC-labels-as-subject,The upshot is that the sweep cannot route a payload whose session ended.,not-contains:upshot,icontains:sweep
+labelsubj-07,rewrite,PC-labels-as-subject,The implication is that a rebuild voids both TCC grants.,not-contains:implication,icontains:TCC
+labelsubj-08,rewrite,PC-labels-as-subject,The core problem is that four templates state four different cadences.,not-contains:core problem,icontains:four
+labelsubj-09,preserve,PC-labels-as-subject,"The risk is 4 of the 33 teams, which is who would be blocked by a freeze.",icontains:4 of the 33,
+labelsubj-10,preserve,PC-labels-as-subject,The consequence is measured at 31 blocked merges since June.,icontains:31 blocked,
+cannot-03,rewrite,PC-cannot,The uploader cannot reach the bucket when the token expires.,not-contains:cannot,icontains:token
+cannot-04,rewrite,PC-cannot,The sweep cannot find a routing target for an expired session.,not-contains:cannot,icontains:session
+cannot-05,rewrite,PC-cannot,A developer cannot run the dependency scan locally because the credential is missing.,not-contains:cannot,icontains:credential
+cannot-06,rewrite,PC-cannot,We cannot read two of the subscriptions without an access grant.,not-contains:cannot,icontains:access grant
+cannot-07,rewrite,PC-cannot,The build cannot complete while the index is still rebuilding.,not-contains:cannot,icontains:index
+cannot-08,preserve,PC-cannot,pdf.js cannot load a `blob:` URL.,icontains:cannot,
+cannot-09,preserve,PC-cannot,A Basic SKU gateway cannot host a WAF policy of its own.,icontains:cannot,
+cannot-10,preserve,PC-cannot,The GC-pause step is not instrumented and cannot be closed with available telemetry.,icontains:cannot,
