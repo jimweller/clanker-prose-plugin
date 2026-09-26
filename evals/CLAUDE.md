@@ -298,6 +298,29 @@ arms rather than the overall number, because most contract edits move them in
 opposite directions. Telling an editor to cut harder raises the rewrite arm and
 lowers the preserve arm.
 
+### The triad and passive rewording, 2026-09-26
+
+The `PC-parallel-triads` exemption was narrowed to ordered sequences, and the
+`PC-agentless-passive` exemption to a passive whose sentence names no actor. The judge
+was pinned to the pre-edit catalog. The measurement reran the 19 compliance paragraphs
+where either rule, or an invented actor under `PC-add-nothing`, had fired, at
+`--repeat 3`. A control reran the same paragraphs with the unedited contract, because a
+paragraph picked for a finding tends to show fewer findings on any rerun. Finding
+counts are majority findings.
+
+| Writer        | Arm            | Clean    | `PC-parallel-triads` findings | Invented-actor findings |
+| ------------- | -------------- | -------- | ----------------------------- | ----------------------- |
+| `opus` xhigh  | Control        | 35 of 57 | 13                            | 0                       |
+| `opus` xhigh  | Edited, pass 1 | 44 of 57 | 3                             | 0                       |
+| `opus` xhigh  | Edited, pass 2 | 48 of 57 | 3                             | 0                       |
+| `sonnet` high | Control        | 16 of 57 | 9                             | 3                       |
+| `sonnet` high | Edited, pass 1 | 21 of 57 | 2                             | 2                       |
+| `sonnet` high | Edited, pass 2 | 18 of 56 | 0                             | 6                       |
+
+The triad wording cut its findings for both writers against the control. The passive
+wording showed no effect on invented actors. It stays because it removes a
+contradiction between the rule's definition and its exemption.
+
 ## Adding a new slop sample
 
 **One. Name the rule it violates.** Search inside `<prose-contract>` for a rule that
