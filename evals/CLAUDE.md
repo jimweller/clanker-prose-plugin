@@ -67,25 +67,35 @@ the writer. `tools/rejudge-tests.py` builds its tests from a prior `-o` JSON, an
 text judge, and two rejudges of the same text.
 
 Measured on 2026-09-26, on the 71 first-repeat rewrites of the last legacy run.
+The first two whole-mode rejudges ran before the catalog extraction was anchored, and
+three stray lines of the skill's header reached the judge. The third column is the
+fixed catalog and is the number to quote.
 
-| Measure                                           | Result                 |
-| ------------------------------------------------- | ---------------------- |
-| Clean by majority, JSON judge, two rejudges       | 69.0% and 70.4%        |
-| Clean, legacy text judge on the same rewrites     | 71.8%                  |
-| Clean-majority agreement between the two rejudges | 64 of 71 (90%)         |
-| Pass-vs-pass clean agreement                      | 177 of 213 pairs (83%) |
-| Pass-vs-pass finding agreement                    | 44 of 108 (41%)        |
-| Per-pass verdict agreement with the legacy judge  | 149 of 213 (70%)       |
-| Finding agreement with the legacy judge           | 18 of 118 (15%)        |
+| Measure                                          | Whole, before fix | Whole, fixed | Groups, fixed |
+| ------------------------------------------------ | ----------------- | ------------ | ------------- |
+| Clean by majority                                | 69.0%, 70.4%      | 73.2%        | 42.3%         |
+| Clean-majority agreement between two rejudges    | 64 of 71 (90%)    | not run      | not run       |
+| Pass-vs-pass clean agreement                     | 83%               | 81%          | 79%           |
+| Pass-vs-pass finding agreement                   | 41%               | 30%          | 45%           |
+| Per-pass verdict agreement with the legacy judge | 70%               | 73%          | 55%           |
+| Finding agreement with the legacy judge          | 15%               | 11%          | 7%            |
+| Judge cost for 71 rows                           | $26               | $26          | $126          |
 
-The legacy judge ran on the model before `opus` 5.5, so the agreement with it
-mixes a format change with a model change. Whole mode costs about $0.36 of judge
-per row and group mode about $1.81, measured on smoke runs.
+The legacy text judge scored the same 71 rewrites 71.8 percent clean. It ran on the
+model before `opus` 5.5, so the agreement with it mixes a format change with a model
+change.
 
-The generation loop is blocked on `opus` 5.5. The model's safeguard refuses
-`prompts/generate-notes.txt` with `reasoning_extraction` on 4 of 4 calls. A variant
-without the notes section passed 3 of 3, and a variant whose notes lines copy the
-rewrite prompt's wording failed 2 of 4. The prompt is unchanged pending a decision.
+Group mode stays opt-in. Its clean agreement did not beat whole mode by the 5 points
+the plan required. It is the stricter instrument, though. On rows whole mode called
+clean, 16 of 20 majority group findings read by hand hold against the rule text, and
+the four that do not were `PC-landing-beats` three times and `PC-add-nothing` once.
+Whole mode's clean rate therefore overstates compliance on these rewrites.
+
+The generation writer uses `prompts/generate.txt`, which asks for no notes. The
+`opus` 5.5 safeguard refused `prompts/generate-notes.txt` with `reasoning_extraction`
+on 4 of 4 calls. Two runs of 15 sheets at `--repeat 3` scored 40.0 percent clean
+before the catalog fix and 48.9 percent after it. Every one of the 90 writers loaded
+the contract by following the plugin's `SessionStart` pointer with Read.
 
 Concurrency measured at 6.2 cases per minute at `-j 24`, 10.7 at `-j 48`, and 20.3
 at `-j 96`. A 213-call compliance arm runs in 5 to 6 minutes at 96. Load average
@@ -419,7 +429,11 @@ On 2026-09-26 the plugin delivery scored 93.3 and 92.9 percent at `--repeat 1`. 
 same-day control with the pre-cut `claude_md.md` loaded as user memory and the
 pre-move skill scored 95.0 percent. The per-case paired difference is -1.9 points
 (t about -2.7 over 595 cases). The banned-literals grader failed on no row in any of
-the three runs.
+the three runs. A fourth arm, the plugin plus the contract preloaded as user memory,
+scored 93.9 percent. It sits 0.8 points above the plugin (t 0.98) and 1.0 below the
+control (t 1.10), so the delivery channel accounts for about half the gap and the rest
+of the old instructions and skill wording for the other half, neither half
+significant alone.
 
 ```bash
 tools/measure-bullet.sh gnomic- before

@@ -180,9 +180,10 @@ def main(argv=None):
         provider = row.get("provider") or {}
         label = provider.get("label") or provider.get("id") or "unknown"
         col = cols.setdefault(label, {"rows": 0, "adapters": set(), "sums": collections.Counter(), "missing_notes": 0,
-                                      "writer_cost": 0.0, "judge_cost": 0.0})
+                                      "writer_cost": 0.0, "judge_cost": 0.0, "refusals": 0})
         col["rows"] += 1
         resp = row.get("response") or {}
+        col["refusals"] += ((resp.get("metadata") or {}).get("safeguard_refusals") or 0)
         # promptfoo also fills row.error with an assertion's failure reason, so only a row
         # that never reached grading is a provider error, whatever its text says.
         err = str(row.get("error") or resp.get("error") or "")
@@ -230,7 +231,8 @@ def main(argv=None):
                     problems.append(f"MISMATCH {label} {name}: recomputed {value:.6f}, promptfoo derived {got}")
         head = " ".join(f"{k}={v:.3f}" for k, v in rates.items() if v is not None and not k.startswith("clean_rate_"))
         print(f"== {label} ==  adapter={'+'.join(sorted(col['adapters'])) or 'none'} rows={col['rows']} judged={s['cmp_judged']} {head}")
-        print(f"  missing notes {col['missing_notes']}  writer_cost=${col['writer_cost']:.2f}  judge_cost=${col['judge_cost']:.2f}")
+        print(f"  missing notes {col['missing_notes']}  safeguard refusals {col['refusals']}  "
+              f"writer_cost=${col['writer_cost']:.2f}  judge_cost=${col['judge_cost']:.2f}")
         for c in CLASSES:
             if s[f"cmp_judged_{c}"]:
                 print(f"  {c:<8}{s[f'cmp_judged_{c}']:>4} rows, clean {s[f'cmp_clean_maj_{c}']:>3} ({100 * s[f'cmp_clean_maj_{c}'] / s[f'cmp_judged_{c}']:.0f}%)")

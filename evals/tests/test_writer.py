@@ -80,7 +80,10 @@ class ArgvTest(unittest.TestCase):
         self.assertNotIn("--settings", argv)
         self.assertEqual(argv[argv.index("--setting-sources") + 1], "")
         self.assertEqual(argv[argv.index("--plugin-dir") + 1], "/plugin")
-        self.assertEqual(argv[argv.index("--tools") + 1], "Read,Skill,Write")
+        # Restricting the tool set with --tools made the opus 5.5 safeguard refuse the
+        # rewrite prompt with reasoning_extraction on 4 of 8 runs of one case, and 0 of 8
+        # without it, so the writer keeps the default tools and pre-approves three.
+        self.assertNotIn("--tools", argv)
         self.assertEqual(argv[argv.index("--allowedTools") + 1], "Read,Skill,Write")
         self.assertEqual(argv[-1], "--no-session-persistence")
 
@@ -200,6 +203,36 @@ class WriterTest(unittest.TestCase):
 
     def test_a_different_skill_is_not_the_contract(self):
         self.not_loaded(stream(hook("SessionStart"), init(), skill_call(name="md-style"), result()))
+
+    def refusal(self):
+        return stream(init(), result("API Error: Opus 5.5 (1M context)'s safeguards flagged this message. Details: `[reasoning_extraction]`", is_error=True))
+
+    def test_a_safeguard_refusal_is_retried_in_a_new_session_and_counted(self):
+        outs = [self.refusal(), ok_stream()]
+        runner = FakeRunner(None)
+        runner.stdout_seq = outs
+        def seq(argv, **kw):
+            runner.stdout = runner.stdout_seq.pop(0)
+            return FakeRunner.__call__(runner, argv, **kw)
+        r, _ = call(seq)
+        self.assertNotIn("error", r)
+        self.assertEqual(r["metadata"]["safeguard_refusals"], 1)
+        self.assertEqual(len(runner.calls), 2)
+        self.assertNotEqual(runner.calls[0]["cwd"], runner.calls[1]["cwd"])
+
+    def test_refusals_past_the_retry_budget_are_a_writer_error(self):
+        runner = FakeRunner(self.refusal())
+        r, _ = call(runner)
+        self.assertRegex(r["error"], r"^WRITER_ERROR: .*reasoning_extraction")
+        self.assertEqual(r["metadata"]["safeguard_refusals"], 3)
+        self.assertEqual(len(runner.calls), 3)
+
+    def test_other_writer_errors_are_not_retried(self):
+        runner = FakeRunner(stream(init(), result("rate limited", is_error=True)))
+        r, _ = call(runner)
+        self.assertRegex(r["error"], r"^WRITER_ERROR: is_error")
+        self.assertEqual(len(runner.calls), 1)
+        self.assertEqual(r["metadata"]["safeguard_refusals"], 0)
 
     def test_a_runner_exception_is_a_writer_error(self):
         def boom(argv, **kw):

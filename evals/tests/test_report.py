@@ -133,6 +133,13 @@ class BucketTest(unittest.TestCase):
         code, out = run(doc(rows))
         self.assertIn("missing notes 0", out)
 
+    def test_safeguard_refusals_are_counted(self):
+        rows = self.rows()
+        rows[0]["response"]["metadata"]["safeguard_refusals"] = 2
+        rows[1]["response"]["metadata"]["safeguard_refusals"] = 1
+        code, out = run(doc(rows))
+        self.assertIn("safeguard refusals 3", out)
+
     def test_any_provider_error_exits_one(self):
         rows = self.rows() + [{"provider": {"label": "comply"}, "success": False, "failureReason": 2,
                                "error": "Error: Python error: startswith first arg must be bytes", "response": {}}]
