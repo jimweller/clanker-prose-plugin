@@ -1,56 +1,37 @@
 #!/usr/bin/env python3
-"""Measures how far the JSON judge agrees with itself, with the incumbent, and across runs.
+"""Measures how far the JSON judge agrees with itself and across runs.
 
 Rows are matched on the stripped rewrite text, never on position, so two runs over the same
 stored replies line up even when promptfoo orders them differently.
 
-Two numbers per comparison, the same two the incumbent judge's noise floor was measured with.
+Two numbers per comparison.
     clean agreement    both sides call the reply clean, or both call it dirty
     finding agreement  findings both sides report, matched on key, over their union
 
 Modes
     within RUN                    every pair of passes inside each row of one graded run
-    incumbent RUN --legacy OLD    every new pass against the legacy text judge's single verdict
-    across RUN_A RUN_B            clean-majority verdicts of two graded runs
+    across RUN_A RUN_B            clean-majority verdicts and majority findings of two graded runs,
+                                  with each rule's agree, a-only, and b-only counts
 
 Exits 1 when no row matched, since every number would then be 0 of 0.
 
 Usage
     tools/judge-agreement.py within RUN_JSON
-    tools/judge-agreement.py incumbent RUN_JSON --legacy LEGACY_JSON
     tools/judge-agreement.py across RUN_A_JSON RUN_B_JSON
 """
 
 import argparse
+import collections
 import itertools
 import json
-import re
 
-REPLY_SECTION = "REWRITE"
 JUDGE_KIND = "comply"
 PREFIX = "cmp"
-LEGACY_FINDING = re.compile(r"^FINDING\s*\|\s*(violation|over-applied)\s*\|\s*(PC-[a-z0-9-]+)", re.MULTILINE | re.IGNORECASE)
-SECTION = re.compile(r"<<<([A-Z]+)>>>")
-
-
-def legacy_keys(block):
-    return {f"{m.group(1).lower()}:{m.group(2)}" for m in LEGACY_FINDING.finditer(block)}
 
 
 def load_rows(path):
     with open(path) as f:
         return json.load(f)["results"]["results"]
-
-
-def sections(text):
-    parts, last, pos = {}, None, 0
-    for m in SECTION.finditer(text):
-        if last:
-            parts[last] = text[pos:m.start()]
-        last, pos = m.group(1), m.end()
-    if last:
-        parts[last] = text[pos:]
-    return parts
 
 
 def graded(row):
@@ -72,13 +53,6 @@ def graded(row):
     return reply, passes, scores[f"{PREFIX}_clean_maj"]
 
 
-def legacy(row):
-    parts = sections((row.get("response") or {}).get("output") or "")
-    if REPLY_SECTION not in parts or "FINDINGS" not in parts:
-        return None
-    return parts[REPLY_SECTION].strip(), legacy_keys(parts["FINDINGS"])
-
-
 def index(items):
     out = {}
     for reply, *rest in items:
@@ -95,15 +69,21 @@ def match(a, b):
     return pairs
 
 
+def majority(passes):
+    """Keys at least floor(P/2)+1 of the passes reported."""
+    m = len(passes) // 2 + 1
+    counts = collections.Counter(k for keys in passes for k in keys)
+    return {k for k, n in counts.items() if n >= m}
+
+
 def ratio(n, d):
     return f"{n}/{d} ({100 * n / d:.0f}%)" if d else f"{n}/{d} (n/a)"
 
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("mode", choices=("within", "incumbent", "across"))
+    ap.add_argument("mode", choices=("within", "across"))
     ap.add_argument("runs", nargs="+")
-    ap.add_argument("--legacy")
     args = ap.parse_args(argv)
 
     if args.mode == "within":
@@ -120,31 +100,26 @@ def main(argv=None):
         print(f"finding agreement {ratio(f_agree, f_union)}")
         return 0 if rows else 1
 
-    if args.mode == "incumbent":
-        if not args.legacy:
-            ap.error("incumbent needs --legacy")
-        new = [g for g in map(graded, load_rows(args.runs[0])) if g]
-        old = [l for l in map(legacy, load_rows(args.legacy)) if l]
-        pairs = match(new, old)
-        agree = total = f_agree = f_union = 0
-        for (passes, _), (old_keys,) in pairs:
-            for keys in passes:
-                total += 1
-                agree += int(bool(keys) == bool(old_keys))
-                f_agree += len(keys & old_keys)
-                f_union += len(keys | old_keys)
-        print(f"matched {len(pairs)} of {len(new)}")
-        print(f"per-pass vs incumbent verdict agreement {ratio(agree, total)}")
-        print(f"finding agreement {ratio(f_agree, f_union)}")
-        return 0 if pairs else 1
-
     if len(args.runs) != 2:
         ap.error("across needs two runs")
     a, b = ([g for g in map(graded, load_rows(r)) if g] for r in args.runs)
     pairs = match(a, b)
     agree = sum(1 for (_, ca), (_, cb) in pairs if ca == cb)
+    per_rule = collections.defaultdict(lambda: [0, 0, 0])
+    for (pa, _), (pb, _) in pairs:
+        ka, kb = majority(pa), majority(pb)
+        for keys, col in ((ka & kb, 0), (ka - kb, 1), (kb - ka, 2)):
+            for k in keys:
+                per_rule[k][col] += 1
+    both, a_only, b_only = (sum(v[i] for v in per_rule.values()) for i in range(3))
     print(f"matched {len(pairs)} of {len(a)} and {len(b)}")
     print(f"clean-majority agreement {ratio(agree, len(pairs))}")
+    print(f"majority findings agree {both}  a-only {a_only}  b-only {b_only}")
+    print(f"majority finding agreement {ratio(both, both + a_only + b_only)}")
+    if per_rule:
+        print(f"{'rule':<34}{'agree':>6}{'a-only':>8}{'b-only':>8}")
+        for rule, (x, y, z) in sorted(per_rule.items(), key=lambda kv: (-sum(kv[1]), kv[0])):
+            print(f"{rule:<34}{x:>6}{y:>8}{z:>8}")
     return 0 if pairs else 1
 
 

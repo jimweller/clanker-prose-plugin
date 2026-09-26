@@ -2,8 +2,7 @@
 """Turns a prior promptfoo -o JSON into providerOutput tests for promptfooconfig.rejudge.yaml.
 
 Each stored rewrite or composed paragraph becomes one test whose providerOutput is the reply, so the judge grades
-text a writer already produced and the writer never runs again. A legacy row contributes
-only its <<<REWRITE>>> section.
+text a writer already produced and the writer never runs again.
 
 Rows that errored are skipped and counted. A row whose text is empty is refused and
 nothing is written, because promptfoo treats an empty providerOutput as absent and calls
@@ -15,30 +14,14 @@ Usage
 
 import json
 import pathlib
-import re
 import sys
 
-REPLY_SECTION = "REWRITE"
 JUDGE_KIND = "comply"
-SECTION = re.compile(r"<<<([A-Z]+)>>>")
 DEFAULT_OUT = pathlib.Path(__file__).resolve().parent.parent / "corpus" / "rejudge" / "tests.json"
 
 
-def section(text, name):
-    parts, last, pos = {}, None, 0
-    for m in SECTION.finditer(text):
-        if last:
-            parts[last] = text[pos:m.start()]
-        last, pos = m.group(1), m.end()
-    if last:
-        parts[last] = text[pos:]
-    return parts.get(name)
-
-
 def reply_of(row):
-    output = (row.get("response") or {}).get("output") or ""
-    legacy = section(output, REPLY_SECTION)
-    return (legacy if legacy is not None else output).strip()
+    return ((row.get("response") or {}).get("output") or "").strip()
 
 
 def main(argv=None):

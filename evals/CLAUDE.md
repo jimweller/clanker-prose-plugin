@@ -62,66 +62,13 @@ them to `REWRITE_NOTES_DIR`. Claude Code refuses a write inside a `--plugin-dir`
 directory as a sensitive file, and `corpus/notes` sits inside the plugin.
 
 `promptfooconfig.comply.rejudge.yaml` grades stored rewrites again without running
-the writer. `tools/rejudge-tests.py` builds its tests from a prior `-o` JSON, and
-`tools/judge-agreement.py` compares passes within a run, a run against the legacy
-text judge, and two rejudges of the same text.
-
-Measured on 2026-09-26, on the 71 first-repeat rewrites of the last legacy run.
-The first two whole-mode rejudges ran before the catalog extraction was anchored, and
-three stray lines of the skill's header reached the judge. The third column is the
-fixed catalog and is the number to quote.
-
-| Measure                                          | Whole, before fix | Whole, fixed | Groups, fixed |
-| ------------------------------------------------ | ----------------- | ------------ | ------------- |
-| Clean by majority                                | 69.0%, 70.4%      | 73.2%        | 42.3%         |
-| Clean-majority agreement between two rejudges    | 64 of 71 (90%)    | not run      | not run       |
-| Pass-vs-pass clean agreement                     | 83%               | 81%          | 79%           |
-| Pass-vs-pass finding agreement                   | 41%               | 30%          | 45%           |
-| Per-pass verdict agreement with the legacy judge | 70%               | 73%          | 55%           |
-| Finding agreement with the legacy judge          | 15%               | 11%          | 7%            |
-| Judge cost for 71 rows                           | $26               | $26          | $126          |
-
-The legacy text judge scored the same 71 rewrites 71.8 percent clean. It ran on the
-model before `opus` 5.5, so the agreement with it mixes a format change with a model
-change.
-
-Group mode stays opt-in. Its clean agreement did not beat whole mode by the 5 points
-the plan required. It is the stricter instrument, though. On rows whole mode called
-clean, 16 of 20 majority group findings read by hand hold against the rule text, and
-the four that do not were `PC-landing-beats` three times and `PC-add-nothing` once.
-Whole mode's clean rate therefore overstates compliance on these rewrites.
-
-Parity with the legacy harness passed on 2026-09-26. The gate was two compliance runs
-at `--repeat 3` within 7 points of a same-day legacy control, with classes ordered
-`good`, `mixed`, `slop`. The class columns are clean by majority.
-
-| Run            | Judged     | Clean by majority | Clean per pass | `good` | `mixed` | `slop` |
-| -------------- | ---------- | ----------------- | -------------- | ------ | ------- | ------ |
-| B              | 200 of 213 | 75.5%             | 73.3%          | 86%    | 74%     | 60%    |
-| C              | 206 of 213 | 77.2%             | 75.1%          | 87%    | 77%     | 61%    |
-| Legacy control | 213 of 213 | 70.4%             | 70.4%          | 84%    | 61%     | 65%    |
-
-The legacy judge ran one pass per row, so its two rates are one number and the
-per-pass rate is the like-for-like comparison. The 20 unjudged rows are
-`reasoning_extraction` refusals. Run B still passed `--tools` to the writer, and both
-runs predate the retry in `providers/writer.py`.
+the writer. `tools/rejudge-tests.py` builds its tests from a prior `-o` JSON.
+`tools/judge-agreement.py` compares the judge's passes within one run, or two
+rejudges of the same text.
 
 The generation writer uses `prompts/generate.txt`, which asks for no notes. The
 `opus` 5.5 safeguard refused a version of it that asked for notes with
-`reasoning_extraction` on 4 of 4 calls. Two runs of 15 sheets at `--repeat 3` scored 40.0 percent clean
-before the catalog fix and 48.9 percent after it. Every one of the 90 writers loaded
-the contract by following the plugin's `SessionStart` pointer with Read.
-
-Concurrency measured at 6.2 cases per minute at `-j 24`, 10.7 at `-j 48`, and 20.3
-at `-j 96`. A 213-call compliance arm runs in 5 to 6 minutes at 96. Load average
-spikes near 140 on 14 cores for the first minute, which is 96 CLI processes
-booting rather than contention, and settles near 45. 96 sessions hold 16.8 GB
-resident, 175 MB each.
-
-Foundry is not the limit. At `-j 96` the run draws roughly 1M input tokens per
-minute against a 2M ITPM Opus allocation, and that count is pessimistic because it
-charges the contract and the catalog on every call when both are cache reads after
-the first, which ITPM excludes.
+`reasoning_extraction` on 4 of 4 calls.
 
 ## What the compliance loop measures
 
@@ -176,149 +123,54 @@ source. A fact sheet's fragments never match a composed sentence's wording, so n
 every violation reads as `self-inflicted` whether or not the paragraph invented
 anything. Read the clean rate on this loop and ignore its bucket split.
 
-First measurement, 15 sheets at 3 repeats, 45 calls: 49 percent clean. The two largest
-rule concentrations were `PC-add-nothing` (the writer drops a modal or a scoping
-quantifier while compressing a hedged fact into a sentence) and `PC-leading-subordinate`.
-The second one was a corpus defect, not a writer defect: all 15 sheets phrased their
-hedged claim as "Whether X or Y ... has not been Z," a clausal subject, which is the
-exact construction the rule bans, so the sheet itself handed the writer a violation to
-carry through rather than testing whether the writer avoids one unprompted. All 15
-were rewritten to extraposed form ("It has not been tested whether X or Y ...") or, in
-one case, an if/then conditional, preserving every fact.
-
-First fix, extraposing the hedge behind a dummy "it" ("It has not been tested whether
-X"): still 49 percent clean (22/45). `PC-leading-subordinate` findings did not drop to
-zero as expected; the judge held that a dummy-"it" subject still buries the predicate
-and does not satisfy the rule's actual repair, which is to name a real subject, not
-just relocate the clause. That reading is consistent with the rule's own text ("Put the
-subject first"), so the first fix was incomplete rather than wrong. A different rule
-also absorbed the same hedges in this run: `PC-name-the-uncertainty` appeared for the
-first time, firing where the writer turned "it is not yet known whether X, or Y" into
-"X may, or Y may," softening a named uncertainty into a modal.
-
-Second fix, real subjects instead of a dummy "it" ("No test has confirmed whether X",
-"The team does not yet know whether X"), plus two more baked-in patterns found the same
-way and fixed the same way: `Root cause: X` (a label-colon prefix, in all five incident
-sheets) and `Four Ns: A, B, C, and D` (a list-introducing colon in prose, `PC-colons`
-bans this outright with no exemption, in all 15 sheets), and nine semicolon splices
-(`PC-semicolons`, also banned outright) mostly in the "of those four, only A and B did
-X" sentences. All three were sheet-authoring defects, not genuine tests: each handed the
-writer a banned construction to carry through rather than testing composition.
-
-Measured after all three sheet fixes, 45 calls each: 76 percent clean (34/45), then 67
-percent (30/45) on a repeat, then 69 percent (31/45) after the single-line rewrite
-below, averaging 71 percent against the original 49. That was a real, reproduced
-improvement from the corpus fixes alone, unlike every contract-side edit attempted
-earlier this session.
-
-A second, larger jump followed a contract change: expanding `### Worked examples` from
-one paragraph to three (see below). Measured twice on the live catalog, 45 calls each:
-93 percent clean (42/45), then 78 percent (35/45), averaging about 86, both runs clearly
-above the 71 percent plateau and at or above the 82 percent ceiling. The same expansion
-measured on the compliance loop, pinned, moved nothing (66 percent, then 72, against 70
-deployed, the same null result as the original single-example test). Comprehensive
-worked examples help composition far more than editing: a rewrite anchors on the source
-text already in front of the model, while generation has only the fact sheet and the
-contract's worked examples to model good output on, so more of the latter helps more
-here specifically. `PC-add-nothing` remained the leading rule in the corpus-fix-only
-runs (tense and quantifier drift while compressing a fact sheet's bullet into a
-sentence), consistent with every other arm, and dropped to at most one finding per run
-once the worked examples expanded.
-
-One judge-side artifact surfaced in both post-fix runs: `PC-round-trip-damage` fired
-for "list markers collapsed into a paragraph," which is the generation task itself, not
-a defect, since the judge cannot distinguish a fact sheet whose bullets were always
-meant to become one paragraph from a real list an editor flattened by accident. Rather
-than write a generation-aware judge prompt, which would break the same mechanics-only
-discipline that keeps every other prompt honest, the sheets themselves were changed:
-`cases/generate.csv` now holds each sheet as one line of period-separated fragments with
-no bullet markers at all, so there is no list structure left to "collapse." A third
-measurement after that change scored 69 percent clean (31/45) with zero
-`PC-round-trip-damage` findings, confirming the fix. Three measurements now cluster at
-67, 69, and 76 percent, averaging about 71, against the 49 percent baseline before any
-of the three sheet-authoring defects were found. `cases/generate.csv` is single-line
-fragments per sheet, not the bulleted form described earlier in this section.
+A sheet must not carry a construction the contract bans, because the writer carries
+it into the paragraph and the loop then tests the sheet instead of the writer. A
+hedged claim names a real subject ("No test has confirmed whether X"), never a
+clausal subject ("Whether X or Y has not been tested") or a dummy "it". Sheets carry
+no label-colon prefix such as `Root cause:`, no colon introducing a list, and no
+semicolon. Each sheet is one line of period-separated fragments with no bullet
+markers, so the judge has no list to call collapsed under `PC-round-trip-damage`.
 
 ## Where the numbers stand
 
-|                                            | Clean     |
-| ------------------------------------------ | --------- |
-| Sources, judged with no edit at all        | 7%        |
-| After the prose skill rewrites them        | 70%       |
-| Ceiling, what a perfect editor could score | about 82% |
+Every number in this section was measured through the plugin on 2026-09-26.
 
-The source paragraphs are not compliant. Judging all 71 unmodified scores 7 percent
-clean, and the `good` arm scores 0. Those are the paragraphs the contract was
-written from, and "written from" is not "satisfies." Taking 7 to 70 is the measure
-of what the contract does.
+The rewrite suite passed 555 of 595 cases (93.3%) on one run at `--repeat 1` and
+553 of 595 (92.9%) on a second.
 
-Split by class, on the current contract with the judge pinned to the pre-edit
-catalog:
+The compliance loop ran twice at `--repeat 3`. The class columns count rows clean by
+majority.
 
-| Class        | Clean                                                                                                                      |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `good`       | 83% (81% on the current, unpinned catalog)                                                                                 |
-| `mixed`      | 67% (57% on the current, unpinned catalog)                                                                                 |
-| `slop`       | 56% (54% on the current, unpinned catalog)                                                                                 |
-| `generation` | 86% average (93%, 78%) after expanding the worked examples, up from 71% (corpus fixes alone) and 49% (baseline); see below |
+| Run | Judged     | Clean by majority  | Clean per pass     | `good`   | `mixed`  | `slop`   |
+| --- | ---------- | ------------------ | ------------------ | -------- | -------- | -------- |
+| 1   | 200 of 213 | 151 of 200 (75.5%) | 440 of 600 (73.3%) | 64 of 74 | 60 of 81 | 27 of 45 |
+| 2   | 206 of 213 | 159 of 206 (77.2%) | 464 of 618 (75.1%) | 69 of 79 | 62 of 81 | 28 of 46 |
 
-The 83/67/56 figures were all measured with `JUDGE_CATALOG` pinned to a pre-edit
-catalog, which is correct for an A/B but was never followed by a run against the
-catalog a real, unpinned `/prose` invocation actually uses. That run happened once
-this session: 65 percent clean overall (139/213), `good` 80, `mixed` 57, `slop` 54.
-It is lower across every class than the pinned numbers, because a live catalog
-grades with the contract's current, more specific rule text, which finds more of
-what it is looking for. Treat 65/80/57/54 as the quotable numbers and the
-pinned figures above as A/B baselines only.
+The `opus` 5.5 safeguard refused the rows that were not judged with
+`reasoning_extraction`, 13 in run 1 and 7 in run 2. Run 1 still passed `--tools` to
+the writer. Both runs predate the retry in `providers/writer.py`.
 
-`### Worked examples` in the contract expanded from one paragraph to three (a reply and
-a report excerpt added, together with the original paragraph), raising the number of
-rules demonstrated by an actual violated/not-violated table row from 20 of 76 to 61 of
-76 (`check-anchors.py` reports the count). Measured on this loop, pinned, the expansion
-moved nothing: 66 percent (141/213), then 72 (153/212), against 70 deployed-pinned,
-inside the same noise band the original single example landed in. It was kept anyway,
-because the same change produced the largest single result of the session on the
-generation loop below.
+The refused cases were rerun with the current writer, 16 rows in all. No row refused.
+The judge scored 10 of the 16 clean. Four of the rerun cases had refused on 7 of 12
+attempts during run 2. The retry did not fire, so it has run only in unit tests. No
+evidence explains why the refusals stopped.
 
-### The target is 80 percent, not 95
-
-A paragraph one judge pass calls clean is called clean again 82 percent of the
-time, 14 of 17 measured on identical re-judges. The judge spuriously flags about
-one clean paragraph in six, so a perfect editor producing perfectly compliant prose
-still caps near 82 on this instrument. The noise runs both ways: a paragraph called
-dirty comes back clean on a second pass 8 times in 31.
-
-Treat any run above 78 percent as at the ceiling rather than as an improvement.
-Targeting 90 or 95 means targeting a number the instrument cannot produce, and the
-only way to reach it is to make the judge less strict, which is not the same as
-better prose.
-
-Two ways to raise the ceiling itself, neither tried. Run the judge more than once
-per case and take a majority, which trades runtime for precision and is cheap at
-`-j 96`. Or narrow what the judge grades, since it holds all 76 rules at once and
-Anthropic's own guidance is that an isolated judge per dimension beats one judge
-holding every dimension.
+The generation loop ran once at `--repeat 3` and scored 22 of 45 rows clean (48.9%).
+All 45 writers loaded the contract by following the plugin's `SessionStart` pointer
+with Read. That run still passed `--tools` to the writer.
 
 ## What this instrument can and cannot measure
 
-**Only the clean rate is reliable.** Re-judging 48 stored rewrites with the same
-model and settings agreed on 39 percent of individual findings and 81 percent of
-clean-or-dirty verdicts. Per-rule counts below about five are inside that noise.
-On a 213-run arm, roughly 40 runs can flip between two identical runs, so a
-movement smaller than that is not a result.
-
-**Judge passes are a recall mechanism.** One pass finds about 39 percent of what a
-second pass finds. The legacy report took the union of findings across three
-repeats, which were three different rewrites of one case. The promptfoo judge runs
-three passes on one rewrite instead, and `comply-report.py` keeps a finding when a
-majority of those passes report it, or any pass with `--findings union`.
+**Only the clean rate is reliable.** Two passes of the judge on the same rewrite
+agreed on clean or dirty for 518 of 600 pass pairs (86%) in compliance run 1 and 544
+of 618 (88%) in run 2. They agreed on 122 of 244 findings (50%) in run 1 and 112 of
+222 (50%) in run 2. Finding agreement sits well below clean agreement, so per-rule
+counts carry more noise than the clean rate.
 
 **Both sides read the same contract**, so sharpening a rule teaches the judge what
-to look for at the same moment it instructs the editor. Adding a modality clause to
-`PC-add-nothing` raised its finding count, and one finding cited the new clause by
-name while faulting the editor. That was a detector, not a repair. For an A/B, copy
-the pre-edit catalog aside and point `JUDGE_CATALOG` at it, which pins the grader
-so any movement is the editor.
+to look for at the same moment it instructs the editor. For an A/B, copy the
+pre-edit catalog aside and point `JUDGE_CATALOG` at it, which pins the grader so any
+movement is the editor.
 
 ```bash
 cp corpus/catalog.md /tmp/catalog-pinned.md
@@ -327,11 +179,7 @@ JUDGE_CATALOG=/tmp/catalog-pinned.md npx promptfoo@latest eval \
   -c promptfooconfig.comply.yaml --repeat 3 -j 96 -o /tmp/after.json
 ```
 
-**Run an A/B twice before believing it.** The first pinned-judge A/B moved clean
-from 62 to 66 percent, which is inside the noise. The repeat landed at 70, and the
-two post-edit runs agreed with each other more closely than either agreed with the
-baseline, which is what made the movement credible. One run is a direction, two are
-a result.
+**Run an A/B twice before believing it.** One run is a direction, two are a result.
 
 ### Measuring the source baseline
 
@@ -361,16 +209,14 @@ This overwrites the stored rewrites in `corpus/rejudge/comply.json`.
 Eval sessions inherit this machine's configuration unless told otherwise, and both
 kinds of leak have already corrupted a run.
 
-**Hooks.** On one 213-call run the claude-mem worker went unreachable for 65
-consecutive hooks, and some sessions returned the block banner in place of a
-rewrite, which the judge graded as prose. That produced 10 `PC-assistant-tool-leaks`
-findings and 21 runs with no notes file. `providers/writer.py` now runs the rewriter
-with `--setting-sources "" --plugin-dir <this plugin root>`, which drops every
+**Hooks.** The claude-mem worker once went unreachable during a run. Some sessions
+returned its block banner in place of a rewrite, which the judge graded as prose.
+`providers/writer.py` now runs the rewriter with
+`--setting-sources "" --plugin-dir <this plugin root>`, which drops every
 machine-level setting, including the hooks that caused the failure, and loads only
-this plugin. The contract and the skill are the same file, `skills/prose/SKILL.md`;
-the plugin's `SessionStart` hook points the rewriter at it and the rewriter reads it
-directly, rather than relying on a `~/.claude/CLAUDE.md` symlink resolving as a
-project source.
+this plugin. The contract and the skill are the same file, `skills/prose/SKILL.md`.
+The plugin's `SessionStart` hook points the rewriter at it and the rewriter reads it
+directly.
 
 **The contract reaching the judge twice.** The judge is supposed to hold only the
 catalog its prompt carries. `graders/judge.js` runs it with `--bare`, which loads no CLAUDE.md, no
@@ -404,10 +250,9 @@ now round-robins across spaces and authors and writes `page_id`, `space_id`,
 `author_id`, `created` and `expect`.
 
 Meeting minutes are excluded. They are AI-transcribed attributed speech rather than
-authored prose, they score about 10 points worse on the clean rate, and a prose
-contract has no business being measured on them. Also excluded: Jira ADF JSON dumps,
-UUID action-item lists, testimonial quotes, and PRD boilerplate that appeared
-verbatim on three separate pages.
+authored prose. A prose contract has no business being measured on them. Also
+excluded: Jira ADF JSON dumps, UUID action-item lists, testimonial quotes, and PRD
+boilerplate that appeared verbatim on three separate pages.
 
 Everything under `corpus/` is gitignored and stays that way. Both repos holding this
 suite are public, so mined page bodies never get committed. A case reaching
@@ -419,11 +264,9 @@ Every rule opens with a `PC-` id, 76 in total, 55 in `Banned Patterns` and 21 in
 `Ghostwriting`. The five moves in `How to Write` keep their `[move N]` tags, which
 already cross-reference from every banned-pattern rule.
 
-Free-text rule names did not survive two sessions. One run scored
-`trailing supplements` and `trailing supplements that hang a second beat on a
-finished clause` as two rules at 3 each instead of one at 6, and did that to three
-rules. An id is either in the contract or it is not, so `comply-report.py` reports
-any finding citing an id the contract does not define.
+Free-text rule names did not survive two sessions. A judge scored one rule under two
+different names, which split its count. An id is either in the contract or it is not,
+so `comply-report.py` reports any finding citing an id the contract does not define.
 
 `tools/check-anchors.py` fails on an unknown id, a rule with no id or two, a
 duplicate id, a `[move N]` pointing at nothing, and a `corpus/catalog.md` whose
@@ -437,19 +280,7 @@ times in the contract, so the judge had to infer it. Same defect as
 
 ## Measuring a rule change
 
-One pass per case cannot tell a rule improvement from model variance. Three full
-runs of the rewrite suite scored 94, 97 and 96 percent, and between two of them
-`praise adjectives` fell from 100 to 70 on cases nobody had touched.
-
-On 2026-09-26 the plugin delivery scored 93.3 and 92.9 percent at `--repeat 1`. A
-same-day control with the pre-cut `claude_md.md` loaded as user memory and the
-pre-move skill scored 95.0 percent. The per-case paired difference is -1.9 points
-(t about -2.7 over 595 cases). The banned-literals grader failed on no row in any of
-the three runs. A fourth arm, the plugin plus the contract preloaded as user memory,
-scored 93.9 percent. It sits 0.8 points above the plugin (t 0.98) and 1.0 below the
-control (t 1.10), so the delivery channel accounts for about half the gap and the rest
-of the old instructions and skill wording for the other half, neither half
-significant alone.
+One pass per case cannot tell a rule improvement from model variance.
 
 ```bash
 tools/measure-bullet.sh gnomic- before
@@ -495,8 +326,7 @@ teaches nothing and costs a model call on every future run forever.
 
 ## Writing an assertion that survives a rewrite
 
-On the first full run, 36 of 595 cases failed and most were the assertion rather
-than the rule. Four traps produced nearly all of them.
+Four traps make an assertion fail on a correct rewrite.
 
 Matching an inflected word. A rewrite changes `flagging` to `flags`, so
 `icontains:flagging` fails on correct output. Match the stem.
@@ -560,23 +390,12 @@ tools/judge-agreement.py across /tmp/rejudge-opus.json /tmp/rejudge-sonnet.json
 tools/judge-agreement.py within /tmp/rejudge-sonnet.json
 ```
 
-`across` reports clean-majority agreement between the two judges. `within` reports
-clean and finding agreement between one judge's passes. No mode compares findings
-across two judges.
+`across` reports clean-majority agreement and majority-finding agreement between the
+two judges, with each rule's agree, a-only, and b-only counts. `within` reports clean
+and finding agreement between one judge's passes.
 
-The table below was measured on the legacy text judge, against a 39 percent finding-level and 81 percent clean-or-dirty noise
-floor.
-
-| Judge                    | Finding-level | Clean or dirty |
-| ------------------------ | ------------- | -------------- |
-| Opus, identical settings | 39%           | 81%            |
-| Opus, medium effort      | 30%           | 79%            |
-| Sonnet, default          | 21%           | 67%            |
-| Sonnet, medium           | 20%           | 60%            |
-
-Opus at medium sits inside the floor and cannot be shown to differ, so the judge
-runs at medium effort. Sonnet is clearly below it and is not a substitute at any
-effort.
+No judge calibration has run through the plugin yet. The `opus`, medium-effort
+default carries no measured comparison against another judge.
 
 ## Mining candidates
 
@@ -602,75 +421,3 @@ preserve rows. The compliance loop runs 71 paragraphs at three repeats, 213 call
 
 Twenty of the 76 rules have no rewrite-suite case. `check-anchors.py` lists them and
 does not fail, because a rule is allowed to exist before anyone writes a case.
-
-## Open
-
-**The 70 percent is attributed to the trims, not the worked paragraph.** Three
-contract changes landed in the same A/B: the worked paragraph, the `PC-emdashes`
-trim, and the `PC-evidential-status` compression. Removing the worked paragraph and
-re-running the compliance loop with the judge pinned to the same pre-edit catalog
-scored 69 percent clean (146/213), against 70 percent (149/213) with the paragraph
-in. That is inside the roughly-40-run noise band on a 213-run arm, so the paragraph
-carries none of the measured gain; the trims do. Next edits should trim the other
-overloaded rules rather than write more worked paragraphs.
-
-**The quotable number is now measured: 65 percent, not 70.** Running the compliance
-loop with no `JUDGE_CATALOG` pin, so the judge grades against the live, current
-catalog the way a real `/prose` invocation would, scored 65 percent clean overall
-(139/213): `good` 80, `mixed` 57, `slop` 54. Every pinned A/B in this doc, including
-the 83/67/56 split, used a catalog frozen before the worked-paragraph and
-`PC-emdashes`/`PC-evidential-status` edits, which undercounts what the current,
-more specific rule text actually catches. The pinned numbers stay correct for
-measuring an edit's direction; they are not the number to quote for where the
-contract stands today.
-
-**The `good` arm damages about one run in six.** The diagnosis is specific and not
-what it looks like. The editor is not over-applying there. It is editing text that
-needed no edit and introducing defects doing it: a trailing anaphor, a gerund
-subject, a nominalization in the subject slot, a reassigned attribution. That points
-at a missing stop condition rather than a wrong rule.
-
-**`PC-add-nothing` leads every run** at 28 of 74 findings, almost all self-inflicted.
-The editor drops modals, tenses and scoping quantifiers, turning "worked that day"
-into "were working" and "sometimes for days or even weeks" into "for days or even
-weeks." A modality clause was added to the rule and did not move the number.
-
-**Tightening `PC-parallel-triads`'s exemption did not move the number.** The rule was
-the second-largest concentration after `PC-add-nothing`, 11 findings, 5 of them
-`held-then-violation`: the editor invoked the exemption and the judge rejected it,
-which pointed at a genuinely circular criterion ("keep the triad when the split
-would produce [the uniformity that is the reason to split]"). Replaced it with a
-concrete test, an inherent order in the source versus cadence with no such order.
-Pinned A/B against the same pre-worked-paragraph catalog used for the 70 percent
-measurement: 65 percent clean (138/213) against 70 percent deployed, a 5-point move
-on a 213-run arm, inside the roughly-40-run noise band. Reverted rather than spend a
-second run confirming a null result. The disagreement between editor and judge on
-this rule is real and unresolved; rewriting the exemption's wording did not reach it.
-
-**Fleshing out `PC-vague-claims` did not move the number either, and risked a worse
-defect.** The rule was a one-line stub with no markers or exemption, unlike its 45
-siblings ("vague claims without evidence [move 2]"). Expanded it to name markers
-("several teams noticed", "some improvement") and to instruct naming the count,
-comparison, or instance, or saying plainly that none exists. Pinned A/B against the
-same catalog: 67 percent clean (143/213) against 70 percent deployed, inside the
-noise band, with `slop` moving 56 to 44 and `mixed` 67 to 62. `PC-add-nothing`'s
-count rose in the same run, consistent with the writer inventing a number to satisfy
-"name the count" where the fact sheet or source supplied none, fighting the rule
-that already bans that. Reverted. A vague rule may still be underspecified, but
-telling the writer to be specific is not a safe fix on its own without also
-strengthening the "say so plainly" branch enough to out-compete it.
-
-**A self-review pass in the prose skill did not move the number.** All three edits
-above changed contract wording; this one changed the mechanism instead, on the
-theory that a single-pass rewrite with no verification step is inherently noisy.
-`SKILL.md` went from "rewrite, then print" to "draft, reread once sentence by
-sentence against the contract, then print." Pinned A/B: 65 percent clean (138/213)
-against 70 percent deployed, inside the noise band, with every class flat or down
-(`good` 83->75, `mixed` 67->63, `slop` 56->50). Reverted. Four edit attempts across
-two sessions, three on rule text and one on the skill's mechanism, have now each
-landed inside the same noise band. That is itself the finding: at this sample size
-(213 runs, ~40-run noise band) neither a contract edit nor a mechanism edit has yet
-produced a measurable movement, so the next attempt needs to either raise the
-sample size, reduce judge noise (majority-vote or per-dimension judging, both
-already listed above as untried), or accept that 67/56/49 may be closer to this
-population's true rate than to something four small edits can lift.
