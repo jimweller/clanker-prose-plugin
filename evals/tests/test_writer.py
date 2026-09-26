@@ -12,6 +12,11 @@ sys.path.insert(0, str(SUITE / "providers"))
 import writer  # noqa: E402
 
 SKILL = str(SUITE.parent / "skills" / "prose" / "SKILL.md")
+SETTINGS = {"env": {"ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-5-5[1m]", "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-5[1m]"},
+            "modelSettings": {"claude-opus-5-5": {"effortLevel": "xhigh"}, "claude-sonnet-5": {"effortLevel": "high"}}}
+with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as _f:
+    json.dump(SETTINGS, _f)
+SETTINGS_FILE = _f.name
 
 
 def init(plugins=("clanker-prose",), skills=("clanker-prose:prose",), tools=("Read", "Skill", "Write"), path=None):
@@ -64,18 +69,19 @@ class FakeRunner:
         return self.code, self.stdout, "", self.timed_out
 
 
-def call(runner, task="rewrite", environ=None, **config):
+def call(runner, task="rewrite", environ=None, settings_path=SETTINGS_FILE, **config):
     notes_dir = tempfile.mkdtemp()
     env = {"PATH": "/bin", "HOME": "/h", "REWRITE_NOTES_DIR": notes_dir}
     env.update(environ or {})
     r = writer.call_api("The build passes -- it fails on Windows.", {"config": {"task": task, **config}}, {"vars": {}},
-                        runner=runner, environ=env, settings_path="/no/such/settings.json")
+                        runner=runner, environ=env, settings_path=settings_path)
     return r, notes_dir
 
 
 class ArgvTest(unittest.TestCase):
     def test_writer_loads_only_the_prose_plugin_with_read_skill_write(self):
-        argv = writer.build_argv("opus", "/plugin")
+        argv = writer.build_argv("opus", "/plugin", "xhigh")
+        self.assertEqual(argv[argv.index("--effort") + 1], "xhigh")
         self.assertNotIn("--bare", argv)
         self.assertNotIn("--settings", argv)
         self.assertEqual(argv[argv.index("--setting-sources") + 1], "")
@@ -90,6 +96,33 @@ class ArgvTest(unittest.TestCase):
     def test_only_aliases_are_models(self):
         with self.assertRaises(ValueError):
             writer.check_alias("claude-opus-5-5")
+
+
+class EffortTest(unittest.TestCase):
+    # --setting-sources "" drops modelSettings, so the writer passes the effort a real session would use.
+    def test_effort_comes_from_the_model_settings_real_sessions_use(self):
+        self.assertEqual(writer.effort_for("opus", SETTINGS, {}), "xhigh")
+        self.assertEqual(writer.effort_for("sonnet", SETTINGS, {}), "high")
+
+    def test_eval_effort_overrides_the_settings(self):
+        self.assertEqual(writer.effort_for("opus", SETTINGS, {"EVAL_EFFORT": "low"}), "low")
+
+    def test_a_model_with_no_effort_is_an_error(self):
+        with self.assertRaisesRegex(ValueError, "effort"):
+            writer.effort_for("haiku", SETTINGS, {})
+        with self.assertRaisesRegex(ValueError, "effort"):
+            writer.effort_for("opus", SETTINGS, {"EVAL_EFFORT": "extreme"})
+
+    def test_the_writer_runs_at_that_effort(self):
+        runner = FakeRunner(ok_stream())
+        r, _ = call(runner)
+        argv = runner.calls[0]["argv"]
+        self.assertEqual(argv[argv.index("--effort") + 1], "xhigh")
+        self.assertEqual(r["metadata"]["effort"], "xhigh")
+
+    def test_no_settings_and_no_override_is_a_writer_error(self):
+        r, _ = call(FakeRunner(ok_stream()), settings_path="/no/such/settings.json")
+        self.assertRegex(r["error"], r"^WRITER_ERROR: .*effort")
 
 
 class GlyphTest(unittest.TestCase):

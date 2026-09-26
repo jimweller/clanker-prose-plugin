@@ -42,15 +42,16 @@ directory. `graders/judge.js` runs three `claude -p --bare` judge passes against
 carries namedScores for the derived metrics, and one componentResults entry per
 `(kind, rule)` finding with each pass's span.
 
-| Knob                          | Default          | Effect                                                                                           |
-| ----------------------------- | ---------------- | ------------------------------------------------------------------------------------------------ |
-| `EVAL_MODEL`                  | `opus`           | Writer model alias                                                                               |
-| `JUDGE_MODEL`, `JUDGE_EFFORT` | `opus`, `medium` | Judge model alias and effort                                                                     |
-| `JUDGE_PASSES`                | 3                | Judge passes per row                                                                             |
-| `JUDGE_MODE`                  | `whole`          | `groups` splits each pass into the four `tools/bullet-groups.json` groups plus a 54-id remainder |
-| `JUDGE_CATALOG`               | unset            | Pins the judge to a catalog copy for an A/B                                                      |
-| `JUDGE_MAX_PROCS`             | 96               | Concurrent judge processes per promptfoo run                                                     |
-| `REWRITE_NOTES_DIR`           | `corpus/notes`   | Where the editor's notes land                                                                    |
+| Knob                          | Default                                                                | Effect                                                                                           |
+| ----------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `EVAL_MODEL`                  | `opus`                                                                 | Writer model alias                                                                               |
+| `EVAL_EFFORT`                 | the alias's `modelSettings` `effortLevel` in `~/.claude/settings.json` | Writer effort, so a run matches a real session                                                   |
+| `JUDGE_MODEL`, `JUDGE_EFFORT` | `opus`, `medium`                                                       | Judge model alias and effort                                                                     |
+| `JUDGE_PASSES`                | 3                                                                      | Judge passes per row                                                                             |
+| `JUDGE_MODE`                  | `whole`                                                                | `groups` splits each pass into the four `tools/bullet-groups.json` groups plus a 54-id remainder |
+| `JUDGE_CATALOG`               | unset                                                                  | Pins the judge to a catalog copy for an A/B                                                      |
+| `JUDGE_MAX_PROCS`             | 96                                                                     | Concurrent judge processes per promptfoo run                                                     |
+| `REWRITE_NOTES_DIR`           | `corpus/notes`                                                         | Where the editor's notes land                                                                    |
 
 Env beats config, which beats the default. `tools/comply-report.py` recomputes
 every rate and exits 1 on a mismatch with promptfoo's derived metrics, a cached

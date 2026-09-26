@@ -24,6 +24,7 @@ import uuid
 import hashlib
 
 ALIASES = ("haiku", "sonnet", "opus", "fable")
+EFFORTS = ("low", "medium", "high", "xhigh", "max")
 SUITE_ROOT = pathlib.Path(__file__).resolve().parents[1]
 PLUGIN_ROOT = SUITE_ROOT.parent
 SKILL_NAMES = ("clanker-prose:prose",)
@@ -48,11 +49,24 @@ def check_alias(model):
     return model
 
 
-def read_settings_env(path):
+def read_settings(path):
     p = pathlib.Path(path)
     if not p.is_file():
         return {}
-    return json.loads(p.read_text()).get("env", {})
+    return json.loads(p.read_text())
+
+
+def effort_for(model, settings, environ):
+    """The effort a real session gives this alias. --setting-sources "" drops modelSettings,
+    so the writer resolves it the same way: alias to model id, model id to effortLevel."""
+    effort = environ.get("EVAL_EFFORT")
+    if effort is None:
+        key = f"ANTHROPIC_DEFAULT_{model.upper()}_MODEL"
+        model_id = ((settings.get("env") or {}).get(key) or environ.get(key) or "").split("[")[0]
+        effort = ((settings.get("modelSettings") or {}).get(model_id) or {}).get("effortLevel")
+    if effort not in EFFORTS:
+        raise ValueError(f"no effort for {model!r}, set EVAL_EFFORT or modelSettings effortLevel to one of {', '.join(EFFORTS)}, got {effort!r}")
+    return effort
 
 
 def child_env(parent, settings_env):
@@ -76,14 +90,14 @@ def strip_glyph(text):
     return LEADING_GLYPHS.sub("", first + sep) + rest
 
 
-def build_argv(model, plugin_root):
+def build_argv(model, plugin_root, effort):
     return ["-p", "--setting-sources", "", "--output-format", "stream-json", "--verbose", "--include-hook-events",
             "--strict-mcp-config", "--mcp-config", '{"mcpServers":{}}', "--plugin-dir", str(plugin_root),
             # No --tools. Restricting the tool set made the opus 5.5 safeguard refuse the
             # rewrite prompt with reasoning_extraction on 29 of 426 rows.
             "--allowedTools", TOOLS,
             # --allowedTools is variadic, so a non-variadic flag must follow it.
-            "--model", check_alias(model), "--no-session-persistence"]
+            "--model", check_alias(model), "--effort", effort, "--no-session-persistence"]
 
 
 def render(template, values):
@@ -159,8 +173,10 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
         if task not in TASKS:
             raise ValueError(f"unknown task {task!r}, expected one of {sorted(TASKS)}")
         model = check_alias(environ.get("EVAL_MODEL") or "opus")
+        settings = read_settings(settings_path or pathlib.Path.home() / ".claude" / "settings.json")
+        effort = effort_for(model, settings, environ)
         plugin_dir = str(pathlib.Path(config.get("plugin_dir", PLUGIN_ROOT)).resolve())
-        argv = build_argv(model, plugin_dir)
+        argv = build_argv(model, plugin_dir, effort)
         notes_dir = pathlib.Path(environ.get("REWRITE_NOTES_DIR") or SUITE_ROOT / "corpus" / "notes")
         # A persistent worker reuses its PID, so the name carries a random suffix.
         notes_name = f"{hashlib.sha256(prompt.encode()).hexdigest()[:12]}.{uuid.uuid4().hex[:8]}.txt"
@@ -168,9 +184,9 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
     except ValueError as e:
         return {"error": f"WRITER_ERROR: {e}", "metadata": meta}
     notes_path = notes_dir / notes_name
-    meta.update({"model": model, "argv": argv, "plugin_dir": plugin_dir, "notes_path": str(notes_path), "notes_expected": "{{notes}}" in template})
+    meta.update({"model": model, "effort": effort, "argv": argv, "plugin_dir": plugin_dir, "notes_path": str(notes_path), "notes_expected": "{{notes}}" in template})
 
-    env = child_env(environ, read_settings_env(settings_path or pathlib.Path.home() / ".claude" / "settings.json"))
+    env = child_env(environ, settings.get("env", {}))
     # Claude Code refuses a write inside a --plugin-dir directory as a sensitive file, and
     # corpus/notes sits inside the plugin, so the editor writes to its own working
     # directory and the notes are copied out before that directory is removed.
