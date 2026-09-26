@@ -13,17 +13,17 @@ The two enumerations disagree in distinct ways, and each one points at a differe
     self-inflicted            No span the judge quoted for R appears in the original, so the
                               rewrite created the defect. The contract caused what it bans.
 
-Reads both shapes of run. A graded row carries the promptfoo judge's GradingResult, with
-namedScores and one componentResults entry per finding key, and its notes in the provider
-metadata. A legacy row carries the old exec provider's text artifact and is read as one pass.
+Each row carries the promptfoo judge's GradingResult, with namedScores and one
+componentResults entry per finding key, and its notes in the provider metadata. A row with no
+judge result is reported as UNGRADED.
 
 Findings are per row. Each row is one rewrite, so the old union of findings across three
 different rewrites of a case is gone. --findings maj (default) keeps the keys at least
 floor(P/2)+1 judge passes reported, and --findings union keeps a key any pass reported.
 
-For graded rows every rate is recomputed twice, from each row's findings against its own
-namedScores and as column sums against promptfoo's derived metrics. The report exits 1 on
-a mismatch, a cached row, a judge error, or a writer or isolation error.
+Every rate is recomputed twice, from each row's findings against its own namedScores and as
+column sums against promptfoo's derived metrics. The report exits 1 on a mismatch, a cached
+row, an ungraded row, a judge error, or a writer or isolation error.
 
 Usage
     tools/comply-report.py RESULT_JSON [--findings maj|union] [--show N] [--rule PC-ID]
@@ -35,7 +35,6 @@ import json
 import pathlib
 import re
 
-SECTION = re.compile(r"<<<(NOTES|REWRITE|FINDINGS)>>>")
 EVAL_ROOT = pathlib.Path(__file__).resolve().parent.parent
 # The tags sit on lines of their own. The skill's header names the tag inline, so an
 # unanchored match would start there.
@@ -62,17 +61,6 @@ def known_ids():
     return set(re.findall(r"^- `(PC-[a-z0-9-]+)`", blocks[0], re.MULTILINE))
 
 
-def split_artifact(text):
-    parts, last, pos = {}, None, 0
-    for m in SECTION.finditer(text):
-        if last:
-            parts[last] = text[pos:m.start()].strip()
-        last, pos = m.group(1), m.end()
-    if last:
-        parts[last] = text[pos:].strip()
-    return parts
-
-
 def parse_notes(block):
     fired, held = set(), set()
     for line in block.splitlines():
@@ -85,16 +73,6 @@ def parse_notes(block):
         elif tag in ("NOT VIOLATED", "HELD"):
             held.add(cells[1].lower())
     return fired, held
-
-
-def parse_legacy_findings(block):
-    out = []
-    for line in block.splitlines():
-        cells = [c.strip() for c in line.split("|")]
-        if len(cells) < 4 or cells[0].upper() != "FINDING" or cells[1].lower() not in ("violation", "over-applied"):
-            continue
-        out.append({"kind": cells[1].lower(), "rule": cells[2], "spans": [cells[3].strip('"')], "why": cells[4] if len(cells) > 4 else ""})
-    return out
 
 
 def vars_of(row):
@@ -123,21 +101,6 @@ def graded(row, mode):
     meta = (row.get("response") or {}).get("metadata") or {}
     notes = meta.get("notes", "")
     return scores, findings, notes, bool(meta.get("notes_missing")) and meta.get("notes_expected", True), problems
-
-
-def legacy(row):
-    parts = split_artifact((row.get("response") or {}).get("output") or "")
-    findings = parse_legacy_findings(parts.get("FINDINGS", ""))
-    notes = parts.get("NOTES", "")
-    clean = int(not findings)
-    by = lambda k: int(any(f["kind"] == k for f in findings))
-    scores = {"cmp_judged": 1, "cmp_passes": 1, "cmp_pass_clean": clean, "cmp_clean_maj": clean, "cmp_clean_union": clean,
-              "cmp_pass_agree": 1, "cmp_viol_maj": by("violation"), "cmp_over_maj": by("over-applied")}
-    klass = vars_of(row).get("expect")
-    if klass in CLASSES:
-        scores[f"cmp_judged_{klass}"] = 1
-        scores[f"cmp_clean_maj_{klass}"] = clean
-    return scores, findings, notes, "NO NOTES FILE" in notes, []
 
 
 def is_graded(row):
@@ -179,7 +142,7 @@ def main(argv=None):
     for i, row in enumerate(rows):
         provider = row.get("provider") or {}
         label = provider.get("label") or provider.get("id") or "unknown"
-        col = cols.setdefault(label, {"rows": 0, "adapters": set(), "sums": collections.Counter(), "missing_notes": 0,
+        col = cols.setdefault(label, {"rows": 0, "sums": collections.Counter(), "missing_notes": 0,
                                       "writer_cost": 0.0, "judge_cost": 0.0, "refusals": 0})
         col["rows"] += 1
         resp = row.get("response") or {}
@@ -197,9 +160,10 @@ def main(argv=None):
         if (g.get("namedScores") or {}).get("cmp_judge_error") or str(g.get("reason", "")).startswith("JUDGE_ERROR"):
             problems.append(f"JUDGE_ERROR row {i} ({label}): {g.get('reason', '')}")
             continue
-        adapter = "graded" if is_graded(row) else "legacy"
-        col["adapters"].add(adapter)
-        scores, findings, notes, notes_missing, row_problems = graded(row, args.findings) if adapter == "graded" else legacy(row)
+        if not is_graded(row):
+            problems.append(f"UNGRADED row {i} ({label}): no judge result")
+            continue
+        scores, findings, notes, notes_missing, row_problems = graded(row, args.findings)
         problems += [f"{p} (row {i}, {label})" for p in row_problems]
         col["sums"].update(scores)
         col["missing_notes"] += int(notes_missing)
@@ -221,16 +185,15 @@ def main(argv=None):
     for label, col in cols.items():
         s = col["sums"]
         rates = {name: (s[num] / s[den] if s[den] else None) for name, (num, den) in DERIVED.items()}
-        if "graded" in col["adapters"]:
-            derived = prompts.get(label, {})
-            for name, value in rates.items():
-                if value is None:
-                    continue
-                got = derived.get(name)
-                if got is None or abs(got - value) > 1e-9:
-                    problems.append(f"MISMATCH {label} {name}: recomputed {value:.6f}, promptfoo derived {got}")
+        derived = prompts.get(label, {})
+        for name, value in rates.items():
+            if value is None:
+                continue
+            got = derived.get(name)
+            if got is None or abs(got - value) > 1e-9:
+                problems.append(f"MISMATCH {label} {name}: recomputed {value:.6f}, promptfoo derived {got}")
         head = " ".join(f"{k}={v:.3f}" for k, v in rates.items() if v is not None and not k.startswith("clean_rate_"))
-        print(f"== {label} ==  adapter={'+'.join(sorted(col['adapters'])) or 'none'} rows={col['rows']} judged={s['cmp_judged']} {head}")
+        print(f"== {label} ==  rows={col['rows']} judged={s['cmp_judged']} {head}")
         print(f"  missing notes {col['missing_notes']}  safeguard refusals {col['refusals']}  "
               f"writer_cost=${col['writer_cost']:.2f}  judge_cost=${col['judge_cost']:.2f}")
         for c in CLASSES:

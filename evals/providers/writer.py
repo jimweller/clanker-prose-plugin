@@ -28,8 +28,8 @@ SUITE_ROOT = pathlib.Path(__file__).resolve().parents[1]
 PLUGIN_ROOT = SUITE_ROOT.parent
 SKILL_NAMES = ("clanker-prose:prose",)
 SKILL_SUFFIX = "skills/prose/SKILL.md"
-# The generation prompt carries no notes. The opus 5.5 safeguard refused the notes version,
-# prompts/generate-notes.txt, with reasoning_extraction on 4 of 4 calls.
+# The generation prompt carries no notes. The opus 5.5 safeguard refused a version that asked
+# for notes with reasoning_extraction on 4 of 4 calls.
 TASKS = {"rewrite": "prompts/rewrite-notes.txt", "generate": "prompts/generate.txt"}
 TOOLS = "Read,Skill,Write"
 

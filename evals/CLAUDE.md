@@ -91,9 +91,24 @@ clean, 16 of 20 majority group findings read by hand hold against the rule text,
 the four that do not were `PC-landing-beats` three times and `PC-add-nothing` once.
 Whole mode's clean rate therefore overstates compliance on these rewrites.
 
+Parity with the legacy harness passed on 2026-09-26. The gate was two compliance runs
+at `--repeat 3` within 7 points of a same-day legacy control, with classes ordered
+`good`, `mixed`, `slop`. The class columns are clean by majority.
+
+| Run            | Judged     | Clean by majority | Clean per pass | `good` | `mixed` | `slop` |
+| -------------- | ---------- | ----------------- | -------------- | ------ | ------- | ------ |
+| B              | 200 of 213 | 75.5%             | 73.3%          | 86%    | 74%     | 60%    |
+| C              | 206 of 213 | 77.2%             | 75.1%          | 87%    | 77%     | 61%    |
+| Legacy control | 213 of 213 | 70.4%             | 70.4%          | 84%    | 61%     | 65%    |
+
+The legacy judge ran one pass per row, so its two rates are one number and the
+per-pass rate is the like-for-like comparison. The 20 unjudged rows are
+`reasoning_extraction` refusals. Run B still passed `--tools` to the writer, and both
+runs predate the retry in `providers/writer.py`.
+
 The generation writer uses `prompts/generate.txt`, which asks for no notes. The
-`opus` 5.5 safeguard refused `prompts/generate-notes.txt` with `reasoning_extraction`
-on 4 of 4 calls. Two runs of 15 sheets at `--repeat 3` scored 40.0 percent clean
+`opus` 5.5 safeguard refused a version of it that asked for notes with
+`reasoning_extraction` on 4 of 4 calls. Two runs of 15 sheets at `--repeat 3` scored 40.0 percent clean
 before the catalog fix and 48.9 percent after it. Every one of the 90 writers loaded
 the contract by following the plugin's `SessionStart` pointer with Read.
 
@@ -138,8 +153,8 @@ cannot check for an invented or dropped fact, and it cannot catch a rule that on
 bites during first-draft composition rather than editing. `promptfooconfig.generate.yaml`
 runs a second loop for that: a fact sheet in `cases/generate.csv` goes in, a writer
 composes one paragraph under the prose contract, and the same judge prompt grades
-the paragraph with the sheet standing in as the ORIGINAL. `prompts/comply.txt` needed
-no change, since it already grades an EDITED text against an ORIGINAL with no
+the paragraph with the sheet standing in as the ORIGINAL. `prompts/comply-json.txt` needs
+no change, since it grades an EDITED text against an ORIGINAL with no
 assumption that the original was prose.
 
 Each sheet is discrete facts, no sentences, so every fact the paragraph states either
@@ -153,16 +168,13 @@ an incident with a root cause and a costed mitigation, a capacity decision with 
 number, a deadline, and a rejected option, and a migration with a measured benefit and
 an unmeasured risk.
 
-`providers/generate-then-comply.sh` mirrors `rewrite-then-comply.sh`: the writer gets
-`--setting-sources "" --plugin-dir <this plugin root>`, the judge gets `--bare`, and
-the artifact carries the same
-`<<<REWRITE>>>` / `<<<NOTES>>>` / `<<<FINDINGS>>>` markers, so `tools/comply-report.py`
-runs against it unmodified. One caveat specific to this loop: the `self-inflicted`
-bucket keys on whether a violating span appears verbatim in the source, and a fact
-sheet's bullet phrasing never matches a composed sentence's wording, so nearly every
-violation on this arm reads as `self-inflicted` regardless of whether the paragraph
-actually invented anything. Read the clean rate on this arm; do not read its bucket
-split the way the rewrite arm's is read.
+`providers/writer.py` composes the paragraph with `task: generate` under the same
+isolation as the rewriter. `graders/judge.js` grades it the same way as a rewrite, so
+`tools/comply-report.py` reads runs from both loops. The `self-inflicted` bucket
+misleads on this loop. It keys on whether a violating span appears verbatim in the
+source. A fact sheet's fragments never match a composed sentence's wording, so nearly
+every violation reads as `self-inflicted` whether or not the paragraph invented
+anything. Read the clean rate on this loop and ignore its bucket split.
 
 First measurement, 15 sheets at 3 repeats, 45 calls: 49 percent clean. The two largest
 rule concentrations were `PC-add-nothing` (the writer drops a modal or a scoping
@@ -323,22 +335,26 @@ a result.
 
 ### Measuring the source baseline
 
-Judging the sources with the rewrite set equal to the source gives the floor, and
-the harness has no config for it. Stage the pairs by hand.
+Judging the sources with the rewrite set equal to the source gives the floor.
+`promptfooconfig.comply.rejudge.yaml` does this when its tests carry no
+`providerOutput`, because its `echo` provider then returns the rendered passage.
+Write `corpus/comply.csv` into the rejudge tests file and run the config.
 
 ```bash
-mkdir -p /tmp/ceil
 python3 - <<'PY'
-import csv, pathlib
-for r in csv.DictReader(open("corpus/comply.csv")):
-    d = pathlib.Path("/tmp/ceil")/r["__description"]; d.mkdir(exist_ok=True)
-    (d/"source.txt").write_text(r["passage"])
-    (d/"rewrite.txt").write_text(r["passage"])
+import csv, json, pathlib
+tests = [{"description": r["__description"], "vars": {k: v for k, v in r.items() if not k.startswith("__")}}
+         for r in csv.DictReader(open("corpus/comply.csv"))]
+out = pathlib.Path("corpus/rejudge/comply.json")
+out.parent.mkdir(parents=True, exist_ok=True)
+out.write_text(json.dumps(tests, indent=1, ensure_ascii=False) + "\n")
 PY
+npx promptfoo@0.123.1 eval -c promptfooconfig.comply.rejudge.yaml --no-cache -o /tmp/source.json
+tools/comply-report.py /tmp/source.json
 ```
 
-Then render `prompts/comply.txt` against each pair and run the judge with `--bare`.
-71 calls at `-P 48` takes under a minute.
+This overwrites the stored rewrites in `corpus/rejudge/comply.json`.
+`tools/rejudge-tests.py` rebuilds them from a run's `-o` JSON.
 
 ## Isolation
 
@@ -348,8 +364,8 @@ kinds of leak have already corrupted a run.
 **Hooks.** On one 213-call run the claude-mem worker went unreachable for 65
 consecutive hooks, and some sessions returned the block banner in place of a
 rewrite, which the judge graded as prose. That produced 10 `PC-assistant-tool-leaks`
-findings and 21 runs with no notes file. The rewriter now passes
-`--setting-sources "" --plugin-dir <this plugin root>`, which drops every
+findings and 21 runs with no notes file. `providers/writer.py` now runs the rewriter
+with `--setting-sources "" --plugin-dir <this plugin root>`, which drops every
 machine-level setting, including the hooks that caused the failure, and loads only
 this plugin. The contract and the skill are the same file, `skills/prose/SKILL.md`;
 the plugin's `SessionStart` hook points the rewriter at it and the rewriter reads it
@@ -357,7 +373,7 @@ directly, rather than relying on a `~/.claude/CLAUDE.md` symlink resolving as a
 project source.
 
 **The contract reaching the judge twice.** The judge is supposed to hold only the
-catalog its prompt carries. It passes `--bare`, which loads no CLAUDE.md, no
+catalog its prompt carries. `graders/judge.js` runs it with `--bare`, which loads no CLAUDE.md, no
 plugin, and no hook, so nothing but the prompt's own catalog text reaches it.
 `--bare` is wrong for the rewriter for a different reason now: it disables plugin
 hooks unconditionally (measured directly, not inferred), which would stop the
@@ -510,8 +526,7 @@ URLs, clock times, and ratios are stripped.
 sources of 40 words or more. `MIN_WORDS` and `TOLERANCE` are guesses.
 
 The compliance and generation loops carry one assertion, `graders/judge.js`, which
-is the judge itself. The legacy configs carried a format check that the judge
-emitted a parseable `VERDICT` line and graded afterward in `comply-report.py`.
+is the judge itself.
 
 ## Layout
 
@@ -530,19 +545,27 @@ emitted a parseable `VERDICT` line and graded afterward in `comply-report.py`.
 
 ## Judge calibration
 
-`tools/calibrate-judge.sh` re-judges rewrites a previous run already produced, using
-a different model or effort, and `calibrate-report.py` diffs the findings. Both
-judges see identical text, so the only variable is the model. Re-running the whole
+`promptfooconfig.comply.rejudge.yaml` re-judges rewrites a previous run already
+produced. `JUDGE_MODEL` and `JUDGE_EFFORT` pick the judge. Both judges see identical
+text, so the only variable is the judge. Re-running the whole
 pipeline would prove nothing, because the rewriter is non-deterministic and the two
 judges would be scoring different text.
 
 ```bash
-tools/calibrate-judge.sh /tmp/run.json claude-sonnet-5 48 medium
-tools/calibrate-report.py corpus/calibrate/claude-sonnet-5-medium
+tools/rejudge-tests.py /tmp/run.json corpus/rejudge/comply.json
+npx promptfoo@0.123.1 eval -c promptfooconfig.comply.rejudge.yaml --no-cache -o /tmp/rejudge-opus.json
+JUDGE_MODEL=sonnet JUDGE_EFFORT=medium npx promptfoo@0.123.1 eval \
+  -c promptfooconfig.comply.rejudge.yaml --no-cache -o /tmp/rejudge-sonnet.json
+tools/judge-agreement.py across /tmp/rejudge-opus.json /tmp/rejudge-sonnet.json
+tools/judge-agreement.py within /tmp/rejudge-sonnet.json
 ```
 
-Measured against a 39 percent finding-level and 81 percent clean-or-dirty noise
-floor:
+`across` reports clean-majority agreement between the two judges. `within` reports
+clean and finding agreement between one judge's passes. No mode compares findings
+across two judges.
+
+The table below was measured on the legacy text judge, against a 39 percent finding-level and 81 percent clean-or-dirty noise
+floor.
 
 | Judge                    | Finding-level | Clean or dirty |
 | ------------------------ | ------------- | -------------- |

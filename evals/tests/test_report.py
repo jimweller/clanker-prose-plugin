@@ -148,21 +148,18 @@ class BucketTest(unittest.TestCase):
         self.assertIn("PROVIDER_ERROR", out)
 
 
-class LegacyTest(unittest.TestCase):
-    def test_legacy_artifacts_are_one_pass_rows(self):
+class UngradedTest(unittest.TestCase):
+    def test_a_row_with_no_judge_result_exits_one(self):
         text = ("<<<REWRITE>>>\nThe team shipped it.\n<<<NOTES>>>\nVIOLATED | PC-emdashes | — | period\n"
                 "<<<FINDINGS>>>\nFINDING | violation | PC-hype | blazing fast | hype\nVERDICT violations=1 over-applied=0\n")
-        rows = [{"provider": {"label": "comply"}, "success": True, "testCase": {"description": "c", "vars": {"passage": SOURCE, "expect": "slop"}},
-                 "response": {"output": text, "cached": False}, "gradingResult": {"componentResults": []}},
-                {"provider": {"label": "comply"}, "success": True, "testCase": {"description": "d", "vars": {"passage": SOURCE, "expect": "good"}},
-                 "response": {"output": "<<<REWRITE>>>\nx\n<<<NOTES>>>\nNO NOTES FILE\n<<<FINDINGS>>>\nVERDICT violations=0 over-applied=0\n", "cached": False},
-                 "gradingResult": {"componentResults": []}}]
-        code, out = run({"results": {"results": rows, "prompts": []}})
-        self.assertEqual(code, 0, out)
-        self.assertIn("adapter=legacy", out)
-        self.assertRegex(out, r"clean_maj_rate=0\.500")
-        self.assertRegex(out, r"missing notes 1")
-        self.assertRegex(out, r"self-inflicted\s+1")
+        rows = [row("case-1", []),
+                {"provider": {"label": "comply"}, "success": True, "testCase": {"description": "c", "vars": {"passage": SOURCE, "expect": "slop"}},
+                 "response": {"output": text, "cached": False}, "gradingResult": {"componentResults": []}}]
+        code, out = run(doc(rows))
+        self.assertEqual(code, 1, out)
+        self.assertIn("UNGRADED row 1 (comply)", out)
+        self.assertNotIn("adapter=", out)
+        self.assertRegex(out, r"judged=1 ")
 
 
 if __name__ == "__main__":
