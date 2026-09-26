@@ -107,3 +107,9 @@ test('every component result names the comply judge', async () => {
   const r = await grade('the edit', ctx({ passes: 3 }), deps(callJudge));
   for (const c of r.componentResults) assert.equal(c.metadata.judge_kind, 'comply');
 });
+
+test('the judge defaults to opus at high effort', () => {
+  const s = resolveSettings({}, {});
+  assert.deepEqual(s.model, { value: 'opus', source: 'default' });
+  assert.deepEqual(s.effort, { value: 'high', source: 'default' });
+});

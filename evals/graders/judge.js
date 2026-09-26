@@ -23,7 +23,7 @@ const DEFAULT_CLASSES = ['good', 'mixed', 'slop'];
 
 const SETTINGS = {
   model: { env: 'JUDGE_MODEL', fallback: 'opus', parse: String },
-  effort: { env: 'JUDGE_EFFORT', fallback: 'medium', parse: String },
+  effort: { env: 'JUDGE_EFFORT', fallback: 'high', parse: String },
   passes: { env: 'JUDGE_PASSES', fallback: 3, parse: positiveInt },
   max_procs: { env: 'JUDGE_MAX_PROCS', fallback: 96, parse: positiveInt },
   retries: { env: 'JUDGE_RETRIES', fallback: 0, parse: nonNegativeInt },

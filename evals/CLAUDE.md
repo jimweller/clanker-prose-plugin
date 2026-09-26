@@ -46,7 +46,7 @@ carries namedScores for the derived metrics, and one componentResults entry per
 | ----------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
 | `EVAL_MODEL`                  | `opus`                                                                 | Writer model alias                                                                               |
 | `EVAL_EFFORT`                 | the alias's `modelSettings` `effortLevel` in `~/.claude/settings.json` | Writer effort, so a run matches a real session                                                   |
-| `JUDGE_MODEL`, `JUDGE_EFFORT` | `opus`, `medium`                                                       | Judge model alias and effort                                                                     |
+| `JUDGE_MODEL`, `JUDGE_EFFORT` | `opus`, `high`                                                         | Judge model alias and effort                                                                     |
 | `JUDGE_PASSES`                | 3                                                                      | Judge passes per row                                                                             |
 | `JUDGE_MODE`                  | `whole`                                                                | `groups` splits each pass into the four `tools/bullet-groups.json` groups plus a 54-id remainder |
 | `JUDGE_CATALOG`               | unset                                                                  | Pins the judge to a catalog copy for an A/B                                                      |
@@ -136,8 +136,8 @@ markers, so the judge has no list to call collapsed under `PC-round-trip-damage`
 
 ## Where the numbers stand
 
-Every number in this section was measured through the plugin on 2026-09-26. The
-compliance and generation writers ran at the effort a real session uses, `opus` at
+Every number in this section was measured through the plugin on 2026-09-26, with the
+judge at medium effort. The compliance and generation writers ran at the effort a real session uses, `opus` at
 xhigh for a main session and `sonnet` at high for a subagent. Every writer loaded the
 contract.
 
@@ -449,7 +449,8 @@ hit that the rule's flag-by-density clause excludes. One is contested between
 reported hold, and one, a three-noun list under `PC-parallel-triads`, is contested.
 High effort found more real violations at about the same precision, for $27.22
 against $25.91 per 71 rows. 14 findings are too few to settle the default on their
-own.
+own. The default moved to high on 2026-09-26 on this review, without a rerun, so every
+number in this file was judged at medium.
 
 A majority of three passes repeats more often than a single pass. Two passes of the
 first `opus` medium rejudge agreed on clean or dirty for 179 of 213 pass pairs, and
