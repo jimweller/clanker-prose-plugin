@@ -1,0 +1,7 @@
+Write one paragraph presenting the facts between the markers, following the prose contract. State every fact on the sheet once. Add no fact the sheet does not carry, and drop none of them, including a number, a date, a modal, a scope, or a hedge.
+
+Print the paragraph and nothing else.
+
+<<<FACTS>>>
+{{input}}
+<<<END>>>

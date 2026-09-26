@@ -28,7 +28,9 @@ SUITE_ROOT = pathlib.Path(__file__).resolve().parents[1]
 PLUGIN_ROOT = SUITE_ROOT.parent
 SKILL_NAMES = ("clanker-prose:prose",)
 SKILL_SUFFIX = "skills/prose/SKILL.md"
-TASKS = {"rewrite": "prompts/rewrite-notes.txt", "generate": "prompts/generate-notes.txt"}
+# The generation prompt carries no notes. The opus 5.5 safeguard refused the notes version,
+# prompts/generate-notes.txt, with reasoning_extraction on 4 of 4 calls.
+TASKS = {"rewrite": "prompts/rewrite-notes.txt", "generate": "prompts/generate.txt"}
 TOOLS = "Read,Skill,Write"
 
 BASE_KEYS = ("PATH", "HOME", "USER", "LANG", "TMPDIR", "SHELL")
@@ -163,7 +165,7 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
     except ValueError as e:
         return {"error": f"WRITER_ERROR: {e}", "metadata": meta}
     notes_path = notes_dir / notes_name
-    meta.update({"model": model, "argv": argv, "notes_path": str(notes_path)})
+    meta.update({"model": model, "argv": argv, "notes_path": str(notes_path), "notes_expected": "{{notes}}" in template})
 
     env = child_env(environ, read_settings_env(settings_path or pathlib.Path.home() / ".claude" / "settings.json"))
     # Claude Code refuses a write inside a --plugin-dir directory as a sensitive file, and
@@ -172,7 +174,10 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
     cwd = tempfile.mkdtemp(prefix="writer-")
     try:
         cwd_notes = pathlib.Path(cwd) / notes_name
-        text = render(template, {"notes": str(cwd_notes), "input": prompt})
+        values = {"input": prompt}
+        if meta["notes_expected"]:
+            values["notes"] = str(cwd_notes)
+        text = render(template, values)
         code, stdout, stderr, timed_out = runner(argv, input=text, cwd=cwd, env=env,
                                                  timeout_s=int(config.get("writer_timeout_ms", 540000)) / 1000)
         if cwd_notes.is_file():

@@ -126,6 +126,13 @@ class BucketTest(unittest.TestCase):
         self.assertEqual(code, 1)
         self.assertIn("INCONSISTENT", out)
 
+    def test_rows_that_expect_no_notes_do_not_count_as_missing(self):
+        rows = self.rows()
+        for r in rows:
+            r["response"]["metadata"].update({"notes": "", "notes_missing": True, "notes_expected": False})
+        code, out = run(doc(rows))
+        self.assertIn("missing notes 0", out)
+
     def test_any_provider_error_exits_one(self):
         rows = self.rows() + [{"provider": {"label": "comply"}, "success": False, "failureReason": 2,
                                "error": "Error: Python error: startswith first arg must be bytes", "response": {}}]

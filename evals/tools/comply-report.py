@@ -37,7 +37,9 @@ import re
 
 SECTION = re.compile(r"<<<(NOTES|REWRITE|FINDINGS)>>>")
 EVAL_ROOT = pathlib.Path(__file__).resolve().parent.parent
-BLOCK = re.compile(r"<prose-contract>(.*?)</prose-contract>", re.DOTALL)
+# The tags sit on lines of their own. The skill's header names the tag inline, so an
+# unanchored match would start there.
+BLOCK = re.compile(r"^<prose-contract>\n(.*?)^</prose-contract>$", re.DOTALL | re.MULTILINE)
 CLASSES = ("good", "mixed", "slop")
 DERIVED = {
     "clean_maj_rate": ("cmp_clean_maj", "cmp_judged"),
@@ -120,7 +122,7 @@ def graded(row, mode):
     findings = [{"kind": f["kind"], "rule": f["rule"], "spans": [x["span"] for x in f["passes"]], "why": f["passes"][0]["why"], "votes": f["votes"]} for f in keep]
     meta = (row.get("response") or {}).get("metadata") or {}
     notes = meta.get("notes", "")
-    return scores, findings, notes, bool(meta.get("notes_missing")), problems
+    return scores, findings, notes, bool(meta.get("notes_missing")) and meta.get("notes_expected", True), problems
 
 
 def legacy(row):

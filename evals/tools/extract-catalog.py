@@ -27,7 +27,9 @@ import sys
 
 EVAL_ROOT = pathlib.Path(__file__).resolve().parent.parent
 DEFAULT_CONTRACT = EVAL_ROOT.parent / "skills" / "prose" / "SKILL.md"
-BLOCK = re.compile(r"<prose-contract>(.*?)</prose-contract>", re.DOTALL)
+# The tags sit on lines of their own. The skill's header names the tag inline, so an
+# unanchored match would start there.
+BLOCK = re.compile(r"^<prose-contract>\n(.*?)^</prose-contract>$", re.DOTALL | re.MULTILINE)
 RULE_ID = re.compile(r"^- `(PC-[a-z0-9-]+)`", re.MULTILINE)
 
 

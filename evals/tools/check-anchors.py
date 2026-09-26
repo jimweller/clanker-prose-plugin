@@ -35,7 +35,9 @@ import sys
 EVAL_ROOT = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(EVAL_ROOT / "tools"))
 
-BLOCK = re.compile(r"<prose-contract>(.*?)</prose-contract>", re.DOTALL)
+# The tags sit on lines of their own. The skill's header names the tag inline, so an
+# unanchored match would start there.
+BLOCK = re.compile(r"^<prose-contract>\n(.*?)^</prose-contract>$", re.DOTALL | re.MULTILINE)
 BULLET = re.compile(r"^- (.*)$", re.MULTILINE)
 LEADING_ID = re.compile(r"^`(PC-[a-z0-9-]+)` ")
 ANY_ID = re.compile(r"`(PC-[a-z0-9-]+)`")

@@ -142,12 +142,21 @@ class WriterTest(unittest.TestCase):
         self.assertEqual(pathlib.Path(prompted).name, pathlib.Path(r["metadata"]["notes_path"]).name)
         self.assertTrue(pathlib.Path(r["metadata"]["notes_path"]).is_file())
 
-    def test_generate_uses_the_generation_prompt(self):
+    def test_generate_uses_the_notes_free_generation_prompt(self):
+        # The opus 5.5 safeguard refuses the notes version with reasoning_extraction.
         runner = FakeRunner(ok_stream(load=read_call()))
         r, _ = call(runner, task="generate")
         self.assertNotIn("error", r)
-        self.assertIn("Write one paragraph presenting the facts between the markers", runner.calls[0]["input"])
+        sent = runner.calls[0]["input"]
+        self.assertIn("Write one paragraph presenting the facts between the markers", sent)
+        self.assertNotIn("notes", sent)
         self.assertEqual(r["metadata"]["contract_via"], "Read")
+        self.assertFalse(r["metadata"]["notes_expected"])
+        self.assertTrue(r["metadata"]["notes_missing"])
+
+    def test_rewrite_expects_notes(self):
+        r, _ = call(FakeRunner(ok_stream()))
+        self.assertTrue(r["metadata"]["notes_expected"])
 
     def test_missing_notes_are_recorded_not_fatal(self):
         r, _ = call(FakeRunner(ok_stream(), notes=None))
