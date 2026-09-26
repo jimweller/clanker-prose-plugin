@@ -19,6 +19,7 @@ import pathlib
 import re
 import shutil
 import subprocess
+import sys
 import tempfile
 import uuid
 import hashlib
@@ -271,3 +272,22 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
         "tokenUsage": {"prompt": prompt_tokens, "completion": completion, "total": prompt_tokens + completion, "numRequests": 1},
         "metadata": meta,
     }
+
+
+def main(argv=None, environ=None):
+    """writer.py effort ALIAS prints the effort a real session gives ALIAS, for providers/deployed.sh."""
+    argv = sys.argv[1:] if argv is None else argv
+    environ = os.environ if environ is None else environ
+    if len(argv) != 2 or argv[0] != "effort":
+        print("usage: writer.py effort ALIAS", file=sys.stderr)
+        return 2
+    try:
+        print(effort_for(check_alias(argv[1]), read_settings(pathlib.Path.home() / ".claude" / "settings.json"), environ))
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

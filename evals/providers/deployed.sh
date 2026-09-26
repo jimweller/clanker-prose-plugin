@@ -7,8 +7,8 @@
 # drops this machine's user settings and hooks; --plugin-dir loads only this
 # plugin, whose SessionStart hook points the session at skills/prose/SKILL.md.
 # Not --bare: it disables plugin hooks unconditionally, which would stop the
-# contract pointer from ever firing. Set EVAL_MODEL to pin a model, otherwise
-# the session default applies.
+# contract pointer from ever firing. EVAL_MODEL picks the model alias, opus by
+# default, and EVAL_EFFORT overrides its effort.
 set -euo pipefail
 
 EVAL_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,9 +25,11 @@ args=(
   --no-session-persistence
 )
 
-if [[ -n "${EVAL_MODEL:-}" ]]; then
-  args+=(--model "$EVAL_MODEL")
-fi
+# --setting-sources "" also drops modelSettings, so the effort a real session uses
+# for this model comes from writer.py. A model with no effort fails the run.
+MODEL="${EVAL_MODEL:-opus}"
+EFFORT="$(python3 "$EVAL_ROOT/providers/writer.py" effort "$MODEL")"
+args+=(--model "$MODEL" --effort "$EFFORT")
 
 # skills/prose/SKILL.md still carries a STARTER_CHARACTER line inherited from the
 # original clanker-skills prose skill. That marker belongs to the chat register

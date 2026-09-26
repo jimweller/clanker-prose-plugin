@@ -125,6 +125,42 @@ class EffortTest(unittest.TestCase):
         self.assertRegex(r["error"], r"^WRITER_ERROR: .*effort")
 
 
+class DeployedEffortTest(unittest.TestCase):
+    """providers/deployed.sh runs the rewrite suite and resolves its effort through writer.py."""
+
+    def home_with_settings(self):
+        home = pathlib.Path(tempfile.mkdtemp())
+        (home / ".claude").mkdir()
+        (home / ".claude" / "settings.json").write_text(json.dumps(SETTINGS))
+        return home
+
+    def test_the_cli_prints_the_effort_for_an_alias(self):
+        home = self.home_with_settings()
+        p = subprocess.run([sys.executable, str(SUITE / "providers" / "writer.py"), "effort", "sonnet"],
+                           env={"PATH": os.environ["PATH"], "HOME": str(home)}, capture_output=True, text=True)
+        self.assertEqual((p.returncode, p.stdout.strip()), (0, "high"))
+
+    def test_the_cli_fails_when_no_effort_resolves(self):
+        p = subprocess.run([sys.executable, str(SUITE / "providers" / "writer.py"), "effort", "opus"],
+                           env={"PATH": os.environ["PATH"], "HOME": tempfile.mkdtemp()}, capture_output=True, text=True)
+        self.assertEqual(p.returncode, 1)
+        self.assertIn("effort", p.stderr)
+
+    def test_deployed_passes_the_model_and_its_effort(self):
+        home = self.home_with_settings()
+        fake = pathlib.Path(tempfile.mkdtemp())
+        (fake / "claude").write_text("#!/bin/sh\necho \"$@\"\n")
+        (fake / "claude").chmod(0o755)
+        # A scratch HOME makes the mise python3 shim refuse the repo's .mise.toml, so the real
+        # interpreter's directory goes ahead of it.
+        env = {"PATH": f"{fake}:{os.path.dirname(os.path.realpath(sys.executable))}:{os.environ['PATH']}", "HOME": str(home)}
+        p = subprocess.run([str(SUITE / "providers" / "deployed.sh"), "rewrite this"], env=env, capture_output=True, text=True)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn("--model opus --effort xhigh", p.stdout)
+        p = subprocess.run([str(SUITE / "providers" / "deployed.sh"), "rewrite this"], env={**env, "EVAL_MODEL": "sonnet"}, capture_output=True, text=True)
+        self.assertIn("--model sonnet --effort high", p.stdout)
+
+
 class GlyphTest(unittest.TestCase):
     CASES = [
         "✳️ 🖋️ The build fails.\nSecond line ✳️ stays.\n",
