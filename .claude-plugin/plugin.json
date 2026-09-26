@@ -1,5 +1,5 @@
 {
   "name": "clanker-prose",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Prose-contract writing rules, the prose skill, and prose evals for Claude Code"
 }
