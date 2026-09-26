@@ -136,39 +136,41 @@ markers, so the judge has no list to call collapsed under `PC-round-trip-damage`
 
 ## Where the numbers stand
 
-Every number in this section was measured through the plugin on 2026-09-26.
+Every number in this section was measured through the plugin on 2026-09-26. The
+compliance and generation writers ran at the effort a real session uses, `opus` at
+xhigh for a main session and `sonnet` at high for a subagent. Every writer loaded the
+contract.
 
-The rewrite suite passed 555 of 595 cases (93.3%) on one run at `--repeat 1` and
-553 of 595 (92.9%) on a second.
+The compliance loop ran once per writer at `--repeat 3`. The class columns count rows
+clean by majority.
 
-The compliance loop ran twice at `--repeat 3`. The class columns count rows clean by
-majority.
+| Writer        | Judged     | Clean by majority | Clean per pass | `good`   | `mixed`  | `slop`   |
+| ------------- | ---------- | ----------------- | -------------- | -------- | -------- | -------- |
+| `opus` xhigh  | 212 of 213 | 172 of 212        | 509 of 636     | 66 of 80 | 73 of 84 | 33 of 48 |
+| `sonnet` high | 213 of 213 | 99 of 213         | 287 of 639     | 45 of 81 | 43 of 84 | 11 of 48 |
 
-| Run | Judged     | Clean by majority  | Clean per pass     | `good`   | `mixed`  | `slop`   |
-| --- | ---------- | ------------------ | ------------------ | -------- | -------- | -------- |
-| 1   | 200 of 213 | 151 of 200 (75.5%) | 440 of 600 (73.3%) | 64 of 74 | 60 of 81 | 27 of 45 |
-| 2   | 206 of 213 | 159 of 206 (77.2%) | 464 of 618 (75.1%) | 69 of 79 | 62 of 81 | 28 of 46 |
+The generation loop scored 31 of 45 rows clean with the `opus` writer and 16 of 45
+with `sonnet`.
 
-The `opus` 5.5 safeguard refused the rows that were not judged with
-`reasoning_extraction`, 13 in run 1 and 7 in run 2. Run 1 still passed `--tools` to
-the writer. Both runs predate the retry in `providers/writer.py`.
+`sonnet` changed a span an exemption protected on 24 of 213 compliance rows, and
+`opus` on 1 of 212. `PC-add-nothing` leads the `sonnet` findings, 34 of 143 in the
+compliance loop and 14 of 40 in the generation loop. `PC-parallel-triads` leads the
+`opus` compliance findings, 15 of 43.
 
-The refused cases were rerun with the current writer, 16 rows in all. No row refused.
-The judge scored 10 of the 16 clean. Four of the rerun cases had refused on 7 of 12
-attempts during run 2. The retry did not fire, so it has run only in unit tests. No
-evidence explains why the refusals stopped.
+The `opus` 5.5 safeguard refused 8 writer attempts across 6 compliance rows with
+`reasoning_extraction`. The retry recovered 5 of those rows. The sixth was refused on
+all 3 attempts and is the one unjudged row.
 
-The generation loop ran once at `--repeat 3` and scored 22 of 45 rows clean (48.9%).
-All 45 writers loaded the contract by following the plugin's `SessionStart` pointer
-with Read. That run still passed `--tools` to the writer.
+The rewrite suite passed 555 of 595 cases on one run and 553 of 595 on a second. Its
+provider, `providers/deployed.sh`, pins no effort, so both runs used the CLI default.
 
 ## What this instrument can and cannot measure
 
 **Only the clean rate is reliable.** Two passes of the judge on the same rewrite
-agreed on clean or dirty for 518 of 600 pass pairs (86%) in compliance run 1 and 544
-of 618 (88%) in run 2. They agreed on 122 of 244 findings (50%) in run 1 and 112 of
-222 (50%) in run 2. Finding agreement sits well below clean agreement, so per-rule
-counts carry more noise than the clean rate.
+agreed on clean or dirty for 562 of 636 pass pairs on the `opus` compliance run and
+523 of 639 on the `sonnet` run. They agreed on 89 of 191 findings and 319 of 643.
+Finding agreement sits well below clean agreement, so per-rule counts carry more
+noise than the clean rate.
 
 **Both sides read the same contract**, so sharpening a rule teaches the judge what
 to look for at the same moment it instructs the editor. For an A/B, copy the
@@ -397,7 +399,8 @@ tools/judge-agreement.py within /tmp/rejudge-sonnet.json
 two judges, with each rule's agree, a-only, and b-only counts. `within` reports clean
 and finding agreement between one judge's passes.
 
-Measured on 2026-09-26 by rejudging compliance run 2's rewrites, one per paragraph,
+Measured on 2026-09-26 by rejudging an earlier `opus` compliance run's rewrites, from
+a writer at the CLI default effort, one per paragraph,
 71 rows at 3 passes each. Each table row compares a judge with a first `opus` medium
 rejudge, which called 54 of 71 rows clean for $25.91 in 53 seconds.
 
