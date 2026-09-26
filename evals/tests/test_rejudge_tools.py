@@ -71,6 +71,16 @@ class RejudgeTestsTest(unittest.TestCase):
         self.assertEqual(len(json.load(open(out))), 1)
         self.assertIn("skipped 1 error row", text)
 
+    def test_a_dirty_row_is_kept(self):
+        # promptfoo puts a failed assertion's reason in row.error too. Only failureReason 2 is a provider error.
+        dirty = graded_row("dirty", [["violation:PC-a"]] * 3)
+        dirty.update({"error": "PC-a: violation in pass 0", "failureReason": 1, "success": False})
+        out = tempfile.mkdtemp() + "/tests.json"
+        code, text = capture(rejudge.main, [write({"results": {"results": [dirty]}}), out])
+        self.assertEqual(code, 0)
+        self.assertEqual([t["providerOutput"] for t in json.load(open(out))], ["dirty"])
+        self.assertIn("skipped 0 error rows", text)
+
     def test_an_empty_reply_is_refused_and_nothing_is_written(self):
         rows = [graded_row("ok", [[]] * 3), graded_row("   ", [[]] * 3)]
         out = tempfile.mkdtemp() + "/tests.json"

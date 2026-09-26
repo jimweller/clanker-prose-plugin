@@ -35,7 +35,10 @@ def main(argv=None):
 
     tests, empty, errors = [], [], 0
     for i, row in enumerate(rows):
-        if row.get("error") or (row.get("response") or {}).get("error"):
+        err = row.get("error") or (row.get("response") or {}).get("error")
+        # promptfoo also fills row.error with a failed assertion's reason, so only a row
+        # that never reached grading is an error.
+        if err and (not row.get("gradingResult") or row.get("failureReason") == 2):
             errors += 1
             continue
         reply = reply_of(row)
