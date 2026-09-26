@@ -161,8 +161,13 @@ The `opus` 5.5 safeguard refused 8 writer attempts across 6 compliance rows with
 `reasoning_extraction`. The retry recovered 5 of those rows. The sixth was refused on
 all 3 attempts and is the one unjudged row.
 
-The rewrite suite passed 555 of 595 cases on one run and 553 of 595 on a second. Its
-provider, `providers/deployed.sh`, pins no effort, so both runs used the CLI default.
+A `sonnet` writer at xhigh, run after the triad and passive rewording, scored 100 of
+211 compliance rows clean and 18 of 45 generation rows. That is no gain over `sonnet`
+at high for a writer that cost $62.88 against $47.40 on the compliance loop, so
+subagents stay at high.
+
+The rewrite suite passed 551 of 595 cases at `--repeat 1` with the `opus` xhigh
+writer, after the rewording.
 
 ## What this instrument can and cannot measure
 
