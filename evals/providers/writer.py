@@ -159,7 +159,8 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
         if task not in TASKS:
             raise ValueError(f"unknown task {task!r}, expected one of {sorted(TASKS)}")
         model = check_alias(environ.get("EVAL_MODEL") or "opus")
-        argv = build_argv(model, config.get("plugin_dir", PLUGIN_ROOT))
+        plugin_dir = str(pathlib.Path(config.get("plugin_dir", PLUGIN_ROOT)).resolve())
+        argv = build_argv(model, plugin_dir)
         notes_dir = pathlib.Path(environ.get("REWRITE_NOTES_DIR") or SUITE_ROOT / "corpus" / "notes")
         # A persistent worker reuses its PID, so the name carries a random suffix.
         notes_name = f"{hashlib.sha256(prompt.encode()).hexdigest()[:12]}.{uuid.uuid4().hex[:8]}.txt"
@@ -167,7 +168,7 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
     except ValueError as e:
         return {"error": f"WRITER_ERROR: {e}", "metadata": meta}
     notes_path = notes_dir / notes_name
-    meta.update({"model": model, "argv": argv, "notes_path": str(notes_path), "notes_expected": "{{notes}}" in template})
+    meta.update({"model": model, "argv": argv, "plugin_dir": plugin_dir, "notes_path": str(notes_path), "notes_expected": "{{notes}}" in template})
 
     env = child_env(environ, read_settings_env(settings_path or pathlib.Path.home() / ".claude" / "settings.json"))
     # Claude Code refuses a write inside a --plugin-dir directory as a sensitive file, and
@@ -209,6 +210,7 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
     notes = notes_path.read_text() if notes_path.is_file() else ""
     meta.update({
         "plugins": [p.get("name") for p in init.get("plugins") or []],
+        "plugin_paths": [p.get("path") for p in init.get("plugins") or []],
         "skills": init.get("skills") or [],
         "tools": init.get("tools") or [],
         "hook_events": hook_events,
@@ -232,6 +234,9 @@ def call_api(prompt, options, context, runner=None, environ=None, settings_path=
     breaches = []
     if meta["plugins"] != ["clanker-prose"]:
         breaches.append(f"plugins {meta['plugins']} is not ['clanker-prose']")
+    # The installed copy carries the same name, so only the path tells it from this clone.
+    if meta["plugins"] and meta["plugin_paths"] != [plugin_dir]:
+        breaches.append(f"plugin loaded from {meta['plugin_paths']}, not {plugin_dir}")
     if not hook_ok.get("SessionStart"):
         breaches.append("SessionStart hook did not fire")
     if not any(s in meta["skills"] for s in SKILL_NAMES):

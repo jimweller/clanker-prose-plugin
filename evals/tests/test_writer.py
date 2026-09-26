@@ -14,8 +14,8 @@ import writer  # noqa: E402
 SKILL = str(SUITE.parent / "skills" / "prose" / "SKILL.md")
 
 
-def init(plugins=("clanker-prose",), skills=("clanker-prose:prose",), tools=("Read", "Skill", "Write")):
-    return {"type": "system", "subtype": "init", "plugins": [{"name": p} for p in plugins], "skills": list(skills),
+def init(plugins=("clanker-prose",), skills=("clanker-prose:prose",), tools=("Read", "Skill", "Write"), path=None):
+    return {"type": "system", "subtype": "init", "plugins": [{"name": p, "path": path or str(writer.PLUGIN_ROOT)} for p in plugins], "skills": list(skills),
             "tools": list(tools), "mcp_servers": [], "output_style": "default"}
 
 
@@ -180,6 +180,14 @@ class WriterTest(unittest.TestCase):
 
     def test_missing_plugin(self):
         self.breach(stream(hook("SessionStart"), init(plugins=()), skill_call(), result()), "plugin")
+
+    def test_a_plugin_loaded_from_outside_the_clone_is_a_breach(self):
+        # The installed copy carries the same name, so only the path tells it from the clone.
+        cache = "/Users/x/.claude/plugins/cache/jimweller/clanker-prose/0.1.0"
+        r, _ = call(FakeRunner(stream(hook("SessionStart"), init(path=cache), skill_call(), result())))
+        self.assertRegex(r.get("error", ""), r"^ISOLATION_BREACH.*plugins/cache")
+        self.assertEqual(r["metadata"]["plugin_paths"], [cache])
+        self.assertEqual(r["metadata"]["plugin_dir"], str(writer.PLUGIN_ROOT))
 
     def test_missing_session_start(self):
         self.breach(stream(init(), skill_call(), result()), "SessionStart")
